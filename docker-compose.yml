@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+
+  backend:
+    restart: always
+    build: backend
+    ports:
+      - '127.0.0.1:${VITE_BACKEND_PORT_CONTAINER}:${BACKEND_PORT}'
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./${CONTAINER_DATA_DIR}/data:/srv/backend/data
+
+  frontend:
+    restart: always
+    container_name: boilerplate-frontend
+    
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    ports:
+      - 127.0.0.1:${VITE_FRONTEND_PORT_CONTAINER}:80
