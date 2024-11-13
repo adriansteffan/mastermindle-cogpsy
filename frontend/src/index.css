@@ -2,6 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {margin: 0; height: 100%; overflow: hidden; touch-action: none;}
+html,
+body {
+  touch-action: none;
+}
 
-* {-webkit-touch-callout: none;}
+* {
+  -webkit-touch-callout: none;
+}
+
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  src: url('/Atkinson_Hyperlegible/AtkinsonHyperlegible-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  src: url('/Atkinson_Hyperlegible/AtkinsonHyperlegible-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  src: url('/Atkinson_Hyperlegible/AtkinsonHyperlegible-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  src: url('/Atkinson_Hyperlegible/AtkinsonHyperlegible-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
