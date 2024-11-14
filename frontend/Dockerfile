@@ -15,4 +15,6 @@ RUN sed -i 's%/var/www/html%/srv/frontend/dist%g' /etc/apache2/sites-available/0
 RUN npm run build
 RUN rm .env
 
+EXPOSE 80
+
 CMD ["apachectl","-D","FOREGROUND"]
