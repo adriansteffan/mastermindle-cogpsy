@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useRef, useState } from 'react';
 import { Bounce, toast } from 'react-toastify';
 import Quest from './quest';
@@ -479,6 +478,7 @@ function MasterMindleWrapper({
   const [quitLastGame, setQuitLastGame] = useState<boolean>(false);
 
   function switchGameState(data: object) {
+    console.log(data);
     setDataBlock({});
     if (gameState == 'survey' && timeLimit <= 0) {
       next(dataBlock);
