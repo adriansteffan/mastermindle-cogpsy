@@ -16,7 +16,7 @@ services:
 
   frontend:
     restart: always
-    container_name: boilerplate-frontend
+    container_name: mm-frontend
     
     build:
       context: .

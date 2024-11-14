@@ -4,7 +4,7 @@
  
 ## Setup
 
-For deployment, you will need both [docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/install/).
+For deployment, you will need[docker](https://docs.docker.com/engine/install/)
 
 Prepare your `.env` file by following the instructions laid out in the `.env.template` file.
 
@@ -18,7 +18,7 @@ Prepare your `.env` file by following the instructions laid out in the `.env.tem
 To build the docker images, run 
 
 ```
-docker-compose build
+docker compose build
 ```
 
 in the root directory. This might take a while.
@@ -28,16 +28,16 @@ in the root directory. This might take a while.
 After completing the setup, start the webapp with
 
 ```
-docker-compose up -d
+docker compose up -d
 ```
 
 and stop it with
 
 ```
-docker-compose down
+docker compose down
 ```
 
-The frontend and backend will be attached to 127.0.0.1:9940 and 127.0.0.1:9941, respectively (or other ports, depending on what you specified in the .env files).
+The frontend and backend will be attached to 127.0.0.1:9960 and 127.0.0.1:9961, respectively (or other ports, depending on what you specified in the .env files).
 Use Virtualhosts (Apache) or Server Blocks (Nginx) with reverse proxy to expose these to the outside. [This guide](https://gist.github.com/adriansteffan/48c9bda7237a8a7fcc5bb6987c8e1790) explains how to do this for our setup.
 
 ### Updating
@@ -137,9 +137,6 @@ When developing, install [prettier](https://prettier.io/) in VS Code
 * [React](https://react.dev/)
 * [React Query](https://tanstack.com/query/v3/)
 * [TailwindCSS](https://tailwindcss.com/)
-* [Headless UI](https://headlessui.com/)
-* [Formik](https://formik.org/)
-* [dnd kit](https://dndkit.com)
 
 * [Node](https://nodejs.org/en)
 * [Express](https://expressjs.com/)
