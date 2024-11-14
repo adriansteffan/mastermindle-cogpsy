@@ -11,6 +11,12 @@ body {
   -webkit-touch-callout: none;
 }
 
+@layer base {
+  body {
+    @apply select-none;
+  }
+}
+
 @font-face {
   font-family: 'Atkinson Hyperlegible';
   src: url('/Atkinson_Hyperlegible/AtkinsonHyperlegible-Regular.ttf') format('truetype');

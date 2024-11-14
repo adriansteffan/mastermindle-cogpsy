@@ -6,6 +6,7 @@ import Text from './components/text';
 import Quest from './components/quest';
 import MasterMindleWrapper from './components/mastermindlewrapper'
 
+
 function shuffleArray(array: any[]) {
   for (let i = array.length - 1; i >= 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -22,6 +23,14 @@ const componentMap = {
 };
 
 const experiment = [
+  {
+    name: '',
+    type: 'MasterMindleWrapper',
+    props: {
+      blockpos: 1,
+      feedback: 1,
+    },
+  },
   {
     name: '',
     type: 'Text',
