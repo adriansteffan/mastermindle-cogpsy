@@ -6,7 +6,7 @@ services:
     restart: always
     build: backend
     ports:
-      - '127.0.0.1:${VITE_BACKEND_PORT_CONTAINER}:${BACKEND_PORT}'
+      - '${VITE_BACKEND_PORT_CONTAINER}:${BACKEND_PORT}'
     env_file:
       - .env
     environment:
@@ -22,4 +22,4 @@ services:
       context: .
       dockerfile: ./frontend/Dockerfile
     ports:
-      - 127.0.0.1:${VITE_FRONTEND_PORT_CONTAINER}:80
+      - ${VITE_FRONTEND_PORT_CONTAINER}:80
