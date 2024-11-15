@@ -47,24 +47,11 @@ app.get('/checkid', query('id').isString(), (req: Request, res: Response) => {
   return res.send({ duplicate: false });
 });
 
-function jsonToCsv(items: Array<any>) {
-  const header = Object.keys(items[0]);
-  const headerString = header.join(',');
-  // handle null or undefined values here
-  const replacer = (_: any, value: any) => value ?? '';
-  const rowItems = items.map((row) =>
-    header.map((fieldName) => JSON.stringify(row[fieldName], replacer)).join(',')
-  );
-  // join header and body, and break into separate lines
-  const csv = [headerString, ...rowItems].join('\r\n');
-  return csv;
-}
 
 app.post(
   '/data',
   body('id').isString(),
-  body('measures').isArray(),
-  body('logs').isArray(),
+  body('data').isJSON(),
   async (req: Request, res: Response) => {
     const result = validationResult(req);
     if (!result.isEmpty()) {
@@ -79,18 +66,7 @@ app.post(
 
     fs.writeFile(
       `${backendFolder}/${data.id}__${new Date().getTime()}.csv`,
-      jsonToCsv(data.measures),
-      'utf8',
-      function (err: Error | null) {
-        if (err) {
-          return res.status(400).send('Writing file went wrong');
-        }
-      }
-    );
-
-    fs.writeFile(
-      `${backendFolder}/log__${data.id}__${new Date().getTime()}.csv`,
-      jsonToCsv(data.logs),
+      data.data,
       'utf8',
       function (err: Error | null) {
         if (err) {

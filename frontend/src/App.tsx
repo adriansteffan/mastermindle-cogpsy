@@ -4,8 +4,7 @@ import { useState } from 'react';
 import Upload from './components/upload';
 import Text from './components/text';
 import Quest from './components/quest';
-import MasterMindleWrapper from './components/mastermindlewrapper'
-
+import MasterMindleWrapper from './components/mastermindlewrapper';
 
 function shuffleArray(array: any[]) {
   for (let i = array.length - 1; i >= 0; i--) {
@@ -19,7 +18,7 @@ const componentMap = {
   Text,
   Quest,
   Upload,
-  MasterMindleWrapper
+  MasterMindleWrapper,
 };
 
 const experiment = [
@@ -334,10 +333,20 @@ const experiment = [
     name: '',
     type: 'Upload',
   },
+  {
+    name: '',
+    type: 'Text',
+    props: {
+      buttonText: '',
+      content: (
+        <p>
+          Thank you for participating in our study! You can close the tab now.
+        </p>
+      ),
+    },
+  },
 ];
 
-
-console.log(experiment)
 
 // Function to transform experiment definition into components
 const transformExperiment = (
@@ -368,18 +377,46 @@ const transformExperiment = (
   });
 };
 
+interface TrialData {
+  index: number;
+  type: string;
+  name: string;
+  data: object | undefined;
+  start: number;
+  end: number;
+  duration: number;
+}
+
 export default function App() {
   const [trialCounter, setTrialCounter] = useState(0);
-  const [data, setData] = useState({});
+  const [data, setData] = useState<TrialData[]>([]);
+  const [trialStartTime, setTrialStartTime] = useState(performance.now());
 
   function next(newData?: object): void {
-    if (newData) {
-      setData({
-        ...data,
-        newData,
-      });
+    const currentTime = performance.now();
+
+    // Get the current trial information from the experiment
+    // no type definitions for trial types at the moment, that will be a feature if we ever make this into a jspsych alternative
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    const currentTrial: ExperimentTrial = transformExperiment(experiment, next, data)[trialCounter];
+
+    if (currentTrial && data) {
+      const trialData: TrialData = {
+        index: trialCounter,
+        type: currentTrial.type,
+        name: currentTrial.name,
+        data: newData,
+        start: trialStartTime,
+        end: currentTime,
+        duration: currentTime - trialStartTime,
+      };
+
+      setData([...data, trialData]);
     }
 
+    // Set the start time for the next trial
+    setTrialStartTime(currentTime);
     setTrialCounter(trialCounter + 1);
   }
 

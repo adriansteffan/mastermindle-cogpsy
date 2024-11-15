@@ -75,6 +75,16 @@ const ColorOrb: React.FC<ColorOrbProps> = ({
   );
 };
 
+// to pass up to the next function
+interface GuessData {
+  index: number;
+  colors: ColorKey[];
+  results: GuessResult[];
+  start: number;
+  end: number;
+  duration: number;
+}
+
 function MasterMindle({
   feedback,
   next,
@@ -92,9 +102,11 @@ function MasterMindle({
 }) {
   const [selectedColor, setSelectedColor] = useState<ColorKey | null>(null);
   const [currentGuess, setCurrentGuess] = useState<(ColorKey | null)[]>([null, null, null, null]);
-
   const [localTimeLeft, setLocalTimeLeft] = useState<number>(timeLeft);
   const [roundOver, setRoundOver] = useState<boolean>(false);
+
+  const [guessStartTime, setGuessStartTime] = useState<number>(performance.now());
+  const [accumulatedGuesses, setAccumulatedGuesses] = useState<GuessData[]>([]);
 
   const warningShownRef = useRef(false);
 
@@ -106,7 +118,7 @@ function MasterMindle({
     const timer = setInterval(() => {
       setLocalTimeLeft((prev) => {
         const newTime = Math.max(0, prev - 1);
-        
+
         if (newTime === 30 && !warningShownRef.current) {
           warningShownRef.current = true;
           toast('30 seconds remaining!', {
@@ -121,7 +133,7 @@ function MasterMindle({
             autoClose: 4000,
           });
         }
-        
+
         return newTime;
       });
     }, 1000);
@@ -194,8 +206,20 @@ function MasterMindle({
       return;
     }
 
+    const currentTime = performance.now();
     const guessResults = checkGuess(currentGuess as ColorKey[]);
     const isCorrect = guessResults.every((result) => result.status === 'correct');
+
+    const guessData: GuessData = {
+      index: previousGuesses.length,
+      colors: currentGuess as ColorKey[],
+      results: guessResults,
+      start: guessStartTime,
+      end: currentTime,
+      duration: currentTime - guessStartTime,
+    };
+
+    setAccumulatedGuesses((prev) => [...prev, guessData]);
 
     setPreviousGuesses((prev) => [
       ...prev,
@@ -206,21 +230,25 @@ function MasterMindle({
     ]);
 
     if (isCorrect) {
-      console.log('success');
       setRoundOver(true);
       return;
     }
-    if(localTimeLeft == 0){
+    if (localTimeLeft == 0) {
       setRoundOver(true);
     }
     setSelectedColor(null);
     setCurrentGuess([null, null, null, null]);
+    setGuessStartTime(currentTime);
+  };
+
+  const handleNext = () => {
+    setTimeLeft(localTimeLeft);
+    next({ solution: solution, timeLeft: timeLeft, guesses: accumulatedGuesses });
   };
 
   return (
-    
     <div className='p-8 max-w-7xl mx-auto flex flex-row space-x-12 justify-between items'>
-      <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"></div>
+      <div className='absolute inset-0 -z-10 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]'></div>
       <div className='flex gap-6 flex flex-col'>
         {/* Action Buttons */}
         <button
@@ -239,9 +267,8 @@ function MasterMindle({
           <button
             className='bg-white px-8 py-3 border-2 border-red-500 font-bold text-red-500 text-lg rounded-full shadow-[2px_2px_0px_rgba(239,68,68,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
             onClick={() => {
-              setTimeLeft(localTimeLeft);
               setQuitLastGame(true);
-              next({});
+              handleNext();
             }}
           >
             SKIP
@@ -251,8 +278,7 @@ function MasterMindle({
           <button
             className='bg-white px-8 py-3 border-2 border-blue-500 font-bold text-blue-500 text-lg rounded-full shadow-[2px_2px_0px_rgba(59,130,246,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
             onClick={() => {
-              setTimeLeft(localTimeLeft);
-              next({});
+              handleNext();
             }}
           >
             NEXT
@@ -453,43 +479,66 @@ function MasterMindle({
   );
 }
 
+interface MMTrialData {
+  type: 'game' | 'survey';
+  index: number;
+  start: number;
+  end: number;
+  duration: number;
+  data: object;
+  quitLastGame?: boolean;
+}
 
 function MasterMindleWrapper({
   next,
-  data,
   blockpos,
   feedback,
   timeLimit = 300,
 }: {
   next: (data: object) => void;
-  data: object;
   blockpos: number;
   feedback: 1 | 2 | 3 | 4 | 5;
   timeLimit: number;
 }) {
-  console.log(data);
-  console.log(MasterMindle);
-  console.log(next, blockpos, feedback);
-  
-
   const [gameState, setGameState] = useState<'game' | 'survey'>('game');
   const [timeLeft, setTimeLeft] = useState(timeLimit);
-  const [dataBlock, setDataBlock] = useState({});
+  const [trialStartTime, setTrialStartTime] = useState(performance.now());
+  const [accumulatedData, setAccumulatedData] = useState<MMTrialData[]>([]);
   const [quitLastGame, setQuitLastGame] = useState<boolean>(false);
+  const [trialIndex, setTrialIndex] = useState(0);
 
-  function switchGameState(data: object) {
-    console.log(data);
-    setDataBlock({});
-    if (gameState == 'survey' && timeLimit <= 0) {
-      next(dataBlock);
+  function switchGameState(newData: object) {
+    const currentTime = performance.now();
+
+    const trialData: MMTrialData = {
+      type: gameState,
+      index: trialIndex,
+      start: trialStartTime,
+      end: currentTime,
+      duration: currentTime - trialStartTime,
+      data: newData,
+      ...(gameState === 'survey' && { quitLastGame }),
+    };
+
+    setAccumulatedData((prev) => [...prev, trialData]);
+
+    if (gameState === 'survey' && timeLimit <= 0) {
+      next({
+        blockpos: blockpos,
+        feedbacktype: feedback,
+        timelimit: timeLimit,
+        data: accumulatedData,
+      });
       return;
     }
+
     if (gameState === 'survey') {
       setQuitLastGame(false);
-      setGameState('game');
-      return;
     }
-    setGameState('survey');
+
+    setTrialStartTime(currentTime);
+    setTrialIndex((prev) => prev + 1);
+    setGameState(gameState === 'survey' ? 'game' : 'survey');
   }
 
   if (gameState === 'survey') {

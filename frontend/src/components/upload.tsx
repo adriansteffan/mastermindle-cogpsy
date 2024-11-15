@@ -21,12 +21,9 @@ export default function Upload({ next, data }: { next: () => void; data: object 
       return;
     }
     
-    // the anys and dependencies around these measures are ugly
-    // make these more agnostic once we exit the pilot and use this in a more general setting
     upload({
-      id: (data as any).id,
-      measures: (data as any).measures,
-      logs: (data as any).logs,
+      id: 0,
+      data: data,
     });
   }, [data, upload]);
 

@@ -10,16 +10,13 @@ ReactQuestionFactory.Instance.registerQuestion('voicerecorder', (props) => {
   return createElement(VoiceRecorderQuestion, props);
 });
 
-function Quest({ next, surveyJson }: { next: () => void; surveyJson: object }) {
+function Quest({ next, surveyJson }: { next: (data: object) => void; surveyJson: object }) {
   const survey = new Model(surveyJson);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const alertResults = useCallback((sender: any) => {
-    const results = JSON.stringify(sender.data);
-    alert(results);
-    next();
-  }, []);
+    next(sender.data);
+  }, [next]);
 
-  // survey.data
   survey.onComplete.add(alertResults);
   return <Survey model={survey} />;
 }
