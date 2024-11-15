@@ -2,7 +2,8 @@ import express, { Express, Request, Response, Application } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import { body, matchedData, validationResult, query } from 'express-validator';
-import fs from 'fs';
+import fs from 'fs/promises';
+import path from 'path';
 
 //For env File
 dotenv.config();
@@ -26,56 +27,75 @@ app.use(express.urlencoded({ extended: true }));
 
 const PORT = process.env.BACKEND_PORT || 8000;
 
-app.get('/checkid', query('id').isString(), (req: Request, res: Response) => {
-  const result = validationResult(req);
-  if (!result.isEmpty()) {
-    return res.status(400).send({ errors: result.array() });
-  }
-  const data = matchedData(req);
 
-  if (!fs.existsSync(backendFolder)) {
-    return res.send({ duplicate: false });
-  }
+interface FileData {
+  type: string;
+  content: string;
+}
 
-  const files = fs.readdirSync(backendFolder);
-  for (const file of files) {
-    if (data.id === file.replace(/__[^\_]*$/g, '')) {
-      return res.send({ duplicate: true });
-    }
-  }
-
-  return res.send({ duplicate: false });
-});
-
+interface UploadData {
+  sessionId: string;
+  files: FileData[];
+}
 
 app.post(
   '/data',
-  body('id').isString(),
-  body('data').isJSON(),
+  body('sessionId').isString(),
+  body('files').isArray(),
+  body('files.*.type').isString(),
+  body('files.*.content').isString(),
   async (req: Request, res: Response) => {
-    const result = validationResult(req);
-    if (!result.isEmpty()) {
-      return res.status(400).send({ errors: result.array() });
-    }
-
-    const data = matchedData(req);
-
-    if (!fs.existsSync(backendFolder)) {
-      fs.mkdirSync(backendFolder);
-    }
-
-    fs.writeFile(
-      `${backendFolder}/${data.id}__${new Date().getTime()}.csv`,
-      data.data,
-      'utf8',
-      function (err: Error | null) {
-        if (err) {
-          return res.status(400).send('Writing file went wrong');
-        }
+    try {
+      const result = validationResult(req);
+      if (!result.isEmpty()) {
+        return res.status(400).json({ errors: result.array() });
       }
-    );
 
-    return res.send('OK');
+      console.log("sdfsdfsf");
+
+      const data = req.body as UploadData;
+      
+      await fs.mkdir(backendFolder, { recursive: true });
+
+      // Save each file with collision handling
+      const savePromises = data.files.map(async (file) => {
+        const baseFilename = `${data.sessionId}_${file.type}`;
+        let filename = `${baseFilename}.csv`;
+        let counter = 0;
+        
+        while (true) {
+          try {
+            const filePath = path.join(backendFolder, filename);
+            await fs.writeFile(filePath, file.content, { 
+              flag: 'wx', // exclusive write flag
+              encoding: 'utf8'
+            });
+            break;
+          } catch (error: any) {
+            
+            if (error.code === 'EEXIST') {
+              counter++;
+              filename = `${baseFilename}_${counter}.csv`;
+            } else {
+              throw error;
+            }
+          }
+        }
+      });
+
+      await Promise.all(savePromises);
+
+      return res.status(200).json({ 
+        status: 200, 
+        message: 'Data saved successfully' 
+      });
+    } catch (error) {
+      console.error('Error saving data:', error);
+      return res.status(500).json({ 
+        status: 500, 
+        message: 'Error saving data' 
+      });
+    }
   }
 );
 

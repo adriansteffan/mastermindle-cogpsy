@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Bounce, toast } from 'react-toastify';
 import Quest from './quest';
+import { now } from '../utils/timing';
 
 const COLORS = {
   red: '#D81B60',
@@ -80,6 +81,7 @@ interface GuessData {
   index: number;
   colors: ColorKey[];
   results: GuessResult[];
+  isCorrect: boolean;
   start: number;
   end: number;
   duration: number;
@@ -105,7 +107,7 @@ function MasterMindle({
   const [localTimeLeft, setLocalTimeLeft] = useState<number>(timeLeft);
   const [roundOver, setRoundOver] = useState<boolean>(false);
 
-  const [guessStartTime, setGuessStartTime] = useState<number>(performance.now());
+  const [guessStartTime, setGuessStartTime] = useState<number>(now());
   const [accumulatedGuesses, setAccumulatedGuesses] = useState<GuessData[]>([]);
 
   const warningShownRef = useRef(false);
@@ -206,7 +208,7 @@ function MasterMindle({
       return;
     }
 
-    const currentTime = performance.now();
+    const currentTime = now();
     const guessResults = checkGuess(currentGuess as ColorKey[]);
     const isCorrect = guessResults.every((result) => result.status === 'correct');
 
@@ -214,6 +216,7 @@ function MasterMindle({
       index: previousGuesses.length,
       colors: currentGuess as ColorKey[],
       results: guessResults,
+      isCorrect: isCorrect,
       start: guessStartTime,
       end: currentTime,
       duration: currentTime - guessStartTime,
@@ -243,7 +246,12 @@ function MasterMindle({
 
   const handleNext = () => {
     setTimeLeft(localTimeLeft);
-    next({ solution: solution, timeLeft: timeLeft, guesses: accumulatedGuesses });
+    next({
+      solution: solution,
+      solved: accumulatedGuesses.some((guess: GuessData) => guess.isCorrect),
+      timeLeft_s: timeLeft,
+      guesses: accumulatedGuesses,
+    });
   };
 
   return (
@@ -493,7 +501,7 @@ function MasterMindleWrapper({
   next,
   blockpos,
   feedback,
-  timeLimit = 300,
+  timeLimit = 10,
 }: {
   next: (data: object) => void;
   blockpos: number;
@@ -502,13 +510,13 @@ function MasterMindleWrapper({
 }) {
   const [gameState, setGameState] = useState<'game' | 'survey'>('game');
   const [timeLeft, setTimeLeft] = useState(timeLimit);
-  const [trialStartTime, setTrialStartTime] = useState(performance.now());
+  const [trialStartTime, setTrialStartTime] = useState(now());
   const [accumulatedData, setAccumulatedData] = useState<MMTrialData[]>([]);
   const [quitLastGame, setQuitLastGame] = useState<boolean>(false);
   const [trialIndex, setTrialIndex] = useState(0);
 
   function switchGameState(newData: object) {
-    const currentTime = performance.now();
+    const currentTime = now();
 
     const trialData: MMTrialData = {
       type: gameState,
@@ -522,11 +530,11 @@ function MasterMindleWrapper({
 
     setAccumulatedData((prev) => [...prev, trialData]);
 
-    if (gameState === 'survey' && timeLimit <= 0) {
+    if (gameState === 'survey' && timeLeft <= 0) {
       next({
         blockpos: blockpos,
         feedbacktype: feedback,
-        timelimit: timeLimit,
+        timelimit_s: timeLimit,
         data: accumulatedData,
       });
       return;
@@ -544,7 +552,7 @@ function MasterMindleWrapper({
   if (gameState === 'survey') {
     return (
       <Quest
-        next={() => switchGameState({})}
+        next={switchGameState}
         surveyJson={{
           pages: [
             {
@@ -584,7 +592,7 @@ function MasterMindleWrapper({
   }
   return (
     <MasterMindle
-      feedback={5}
+      feedback={feedback}
       next={switchGameState}
       maxTime={timeLimit}
       timeLeft={timeLeft}

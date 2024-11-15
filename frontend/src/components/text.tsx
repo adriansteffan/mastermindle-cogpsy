@@ -13,7 +13,7 @@ const Text: React.FC<ProseContainerProps> = ({
   next,
 }) => {
   const handleClick = () => {
-    next({ timestamp: new Date().toISOString() });
+    next({});
   };
 
   return (
