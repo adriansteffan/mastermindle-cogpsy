@@ -51,8 +51,6 @@ app.post(
         return res.status(400).json({ errors: result.array() });
       }
 
-      console.log("sdfsdfsf");
-
       const data = req.body as UploadData;
       
       await fs.mkdir(backendFolder, { recursive: true });
