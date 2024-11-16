@@ -8,7 +8,7 @@ const COLORS = {
   blue: '#1E88E5',
   yellow: '#FFC107',
   green: '#01463A',
-  grey: '#D4D4D4',
+  grey: '#DADADA',
 } as const;
 
 type ColorKey = keyof typeof COLORS;
@@ -65,7 +65,7 @@ const ColorOrb: React.FC<ColorOrbProps> = ({
         border-2
         border-black
         
-        ${interactive ? ' shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none cursor-pointer' : ''}
+        ${interactive ? ' shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none cursor-pointer' : `border-[${size / 8}px]`}
         ${pressed ? ' translate-x-[2px] translate-y-[2px] shadow-none' : ''}
         ${hoverborder ? ' hover:border-4 cursor-pointer' : ''}
       `}
@@ -87,11 +87,29 @@ interface GuessData {
   duration: number;
 }
 
+function useScreenWidth() {
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      setWidth(window.innerWidth);
+    };
+
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
+  return width;
+}
+
 function MasterMindle({
   feedback,
   next,
   maxTime,
   timeLeft,
+  maxGuesses,
   setTimeLeft,
   setQuitLastGame,
 }: {
@@ -99,16 +117,19 @@ function MasterMindle({
   next: (data: object) => void;
   maxTime: number;
   timeLeft: number;
+  maxGuesses: number;
   setTimeLeft: (time: number) => void;
   setQuitLastGame: (quit: boolean) => void;
 }) {
   const [selectedColor, setSelectedColor] = useState<ColorKey | null>(null);
   const [currentGuess, setCurrentGuess] = useState<(ColorKey | null)[]>([null, null, null, null]);
   const [localTimeLeft, setLocalTimeLeft] = useState<number>(timeLeft);
+  const [guessesLeft, setGuessesLeft] = useState<number>(maxGuesses - 1);
   const [roundOver, setRoundOver] = useState<boolean>(false);
 
   const [guessStartTime, setGuessStartTime] = useState<number>(now());
   const [accumulatedGuesses, setAccumulatedGuesses] = useState<GuessData[]>([]);
+  const screenWidth = useScreenWidth();
 
   const warningShownRef = useRef(false);
 
@@ -232,51 +253,80 @@ function MasterMindle({
       },
     ]);
 
+    setSelectedColor(null);
+
     if (isCorrect) {
+      toast.success('You found the solution! Continue to the next trial.', {
+        closeOnClick: true,
+        transition: Bounce,
+      });
+      setSelectedColor(null);
       setRoundOver(true);
       return;
     }
-    if (localTimeLeft == 0) {
+
+    setGuessesLeft((prev) => prev - 1);
+    if (guessesLeft == 0) {
+      toast.error('Out of guesses! Continue to the next trial.', {
+        closeOnClick: true,
+        transition: Bounce,
+      });
+      setSelectedColor(null);
       setRoundOver(true);
     }
-    setSelectedColor(null);
+
+    if (localTimeLeft == 0) {
+      toast.error('Out of time! Continue to the next trial.', {
+        closeOnClick: true,
+        transition: Bounce,
+      });
+      setSelectedColor(null);
+      setRoundOver(true);
+    }
+
     setCurrentGuess([null, null, null, null]);
     setGuessStartTime(currentTime);
   };
 
-  const handleNext = () => {
+  const handleNext = (skipped: boolean) => {
     setTimeLeft(localTimeLeft);
     next({
       solution: solution,
       solved: accumulatedGuesses.some((guess: GuessData) => guess.isCorrect),
+      skipped: skipped,
       timeLeft_s: timeLeft,
       guesses: accumulatedGuesses,
     });
   };
 
   return (
-    <div className='p-8 max-w-7xl mx-auto flex flex-row space-x-12 justify-between items'>
+    <div className='mt-16 md:p-8 lg:mt-16 max-w-7xl h-[calc(100vh-200px)] lg:h-full w-fit mx-auto flex flex-col lg:flex-row xl:gap-x-12 lg:gap-x-8 justify-between lg:justify-center'>
       <div className='absolute inset-0 -z-10 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]'></div>
-      <div className='flex gap-6 flex flex-col'>
-        {/* Action Buttons */}
-        <button
-          className='bg-white px-8 py-3 border-2 border-black font-bold text-lg rounded-full shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
-          onClick={handleCheck}
-        >
-          CHECK
-        </button>
-        <button
-          className='bg-white px-8 py-3 border-2 border-black font-bold text-lg rounded-full shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
-          onClick={() => setCurrentGuess([null, null, null, null])}
-        >
-          CLEAR
-        </button>
+
+      {/* Action Buttons */}
+      <div className='flex gap-6 xl:w-56 xl:px-12 lg:p-4 flex-row justify-center lg:justify-start lg:flex-col'>
         {!roundOver && (
           <button
-            className='bg-white px-8 py-3 border-2 border-red-500 font-bold text-red-500 text-lg rounded-full shadow-[2px_2px_0px_rgba(239,68,68,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+            className='bg-white px-6 md:px-8 py-3 text-sm md:text-lg border-2 border-black font-bold rounded-full shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+            onClick={handleCheck}
+          >
+            CHECK
+          </button>
+        )}
+        {!roundOver && (
+          <button
+            className='bg-white px-6 md:px-8 py-1 md:py-3 text-sm md:text-lg border-2 border-black font-bold rounded-full shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+            onClick={() => setCurrentGuess([null, null, null, null])}
+          >
+            CLEAR
+          </button>
+        )}
+        {!roundOver && (
+          <button
+            className='bg-white px-6 md:px-8 py-1 md:py-3 text-sm md:text-lg border-2 border-black font-bold border-red-500 text-red-500 rounded-full shadow-[2px_2px_0px_rgba(239,68,68,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
             onClick={() => {
               setQuitLastGame(true);
-              handleNext();
+              handleNext(true);
             }}
           >
             SKIP
@@ -284,9 +334,9 @@ function MasterMindle({
         )}
         {roundOver && (
           <button
-            className='bg-white px-8 py-3 border-2 border-blue-500 font-bold text-blue-500 text-lg rounded-full shadow-[2px_2px_0px_rgba(59,130,246,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+            className='bg-white px-6 md:px-8 py-1 md:py-3 text-sm md:text-lg border-2 border-black font-bold border-2 border-black text-black rounded-full shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
             onClick={() => {
-              handleNext();
+              handleNext(false);
             }}
           >
             NEXT
@@ -294,41 +344,29 @@ function MasterMindle({
         )}
       </div>
 
-      <div className='flex justify-between'>
+      {/* Gameboard */}
+      <div className='flex flex-col  justify-between order-first items-center lg:order-none min-h-0'>
         <div className='space-y-8 flex-1'>
-          {/* Timer and Progress */}
+          {/* Timer */}
           <div className='flex justify-between items-center gap-6'>
             <div className='text-2xl font-bold w-20 text-left'>
               {Math.floor(localTimeLeft / 60)}:{(localTimeLeft % 60).toString().padStart(2, '0')}
             </div>
-            <div className='flex-1 h-6 bg-gray-200 rounded-full overflow-hidden'>
-              <div
-                className={`h-full bg-gray-200 rounded-full duration-300 ${Math.ceil(localTimeLeft / 30) * 30 !== maxTime ? ' border-black border-2' : ''}`}
-                style={{
-                  width: `${100 - (100 * Math.ceil(localTimeLeft / 30) * 30) / maxTime}%`,
-                  backgroundImage: `repeating-linear-gradient(
-                  -45deg,
-                  #E5E7EB,
-                  #E5E7EB 10px,
-                  #D1D5DB 10px,
-                  #D1D5DB 20px
-                )`,
-                  transition: 'width 300ms',
-                }}
-              />
-            </div>
           </div>
           {/* Current Guess Slots */}
-          <div className='p-10 rounded-lg'>
-            <div className='flex gap-8 justify-center relative'>
-              <div className='absolute top-1/2 left-0 right-0 h-1 bg-gray-300 -z-10' />
+          <div className='py-5 sm:py-10 md:p-10 rounded-lg'>
+            <div className='flex gap-4 sm:gap-8 justify-center relative w-fit mx-auto'>
+              <div className='absolute top-1/2 h-1 left-0 right-0 bg-gray-300 -z-10' />
               {currentGuess.map((color: ColorKey | null, index: number) => (
                 <ColorOrb
                   key={index}
                   color={color ?? 'grey'}
-                  size={24}
+                  size={screenWidth >= 600 ? 24 : 16}
                   hoverborder={selectedColor != null || (!!color && color !== 'grey')}
                   onClick={() => {
+                    if (roundOver) {
+                      return;
+                    }
                     if (!selectedColor || selectedColor === 'grey') {
                       if (!!color && color != 'grey') {
                         setCurrentGuess((prevGuess) =>
@@ -368,12 +406,16 @@ function MasterMindle({
           {/* Previous Guesses */}
           <div
             ref={guessesContainerRef}
-            className='space-y-6 p-16 border-gray-400 h-[500px] overflow-y-auto'
+            className='space-y-6 md:p-4 lg:p-16 border-gray-400 h-[25vh] lg:h-[40vh] overflow-y-auto'
           >
             {previousGuesses.map((guess, rowNum) => (
-              <div key={rowNum} className='flex items-center gap-8 justify-center'>
-                <div className='w-8 text-xl'>{rowNum + 1}</div>
-                <div className='flex gap-4 flex'>
+              <div
+                key={rowNum}
+                className={`flex items-center gap-4 sm:gap-8 justify-center ${feedback == 3 ? 'flex-col sm:flex-row' : ''}`}
+              >
+                <div className='hidden sm:block w-4 sm:w-8 text-xl'>{rowNum + 1}</div>
+                <div className='flex gap-2 sm:gap-4 flex-row items-center'>
+                  <div className='w-4 sm:hidden sm:w-8 text-xl'>{rowNum + 1}</div>
                   {guess.colors.map((color, index) => (
                     <div key={index} className='flex flex-col items-center'>
                       <ColorOrb key={index} color={color} size={12} />
@@ -457,7 +499,7 @@ function MasterMindle({
       </div>
 
       {/* Right Side - Color Selection */}
-      <div className='space-y-6 px-8'>
+      <div className='lg:space-y-6 xl:px-8 flex flex-row justify-center gap-x-4 sm:gap-x-12 lg:gap-x-0 lg:justify-start lg:flex-col'>
         {(Object.keys(COLORS) as ColorKey[])
           .filter((color) => color !== 'grey')
           .map((color) => (
@@ -468,6 +510,9 @@ function MasterMindle({
                 interactive={selectedColor != color}
                 pressed={selectedColor == color}
                 onClick={() => {
+                  if (roundOver) {
+                    return;
+                  }
                   if (selectedColor == color) {
                     setSelectedColor(null);
                     return;
@@ -476,7 +521,7 @@ function MasterMindle({
                 }}
               />
               <span
-                className={`uppercase text-lg ${selectedColor == color ? 'underline underline-offset-2' : ''}`}
+                className={`hidden lg:inline uppercase text-lg ${selectedColor == color ? 'underline underline-offset-2' : ''}`}
               >
                 {color}
               </span>
@@ -502,11 +547,13 @@ function MasterMindleWrapper({
   blockpos,
   feedback,
   timeLimit = 10,
+  maxGuesses = 10,
 }: {
   next: (data: object) => void;
   blockpos: number;
   feedback: 1 | 2 | 3 | 4 | 5;
   timeLimit: number;
+  maxGuesses: number;
 }) {
   const [gameState, setGameState] = useState<'game' | 'survey'>('game');
   const [timeLeft, setTimeLeft] = useState(timeLimit);
@@ -559,17 +606,11 @@ function MasterMindleWrapper({
               elements: [
                 {
                   type: 'rating',
-                  name: 'intensityOfEffort',
+                  name: 'intensityofeffort',
                   title: 'How effortful was guessing this combination for you?',
                   isRequired: true,
-                  rateValues: [
-                    { value: 1, text: 'Very Low' },
-                    { value: 2, text: 'Low' },
-                    { value: 3, text: 'Somewhat Low' },
-                    { value: 4, text: 'Somewhat High' },
-                    { value: 5, text: 'High' },
-                    { value: 6, text: 'Very High' },
-                  ],
+                  rateMin: 1,
+                  rateMax: 6,
                   minRateDescription: 'Minimal Effort',
                   maxRateDescription: 'Maximum Effort',
                 },
@@ -577,7 +618,7 @@ function MasterMindleWrapper({
                   ? [
                       {
                         type: 'voicerecorder',
-                        name: 'userVoiceResponse',
+                        name: 'whyskip',
                         title: 'Why did you chose to quit before you found the solution?',
                         isRequired: true,
                       },
@@ -595,6 +636,7 @@ function MasterMindleWrapper({
       feedback={feedback}
       next={switchGameState}
       maxTime={timeLimit}
+      maxGuesses={maxGuesses}
       timeLeft={timeLeft}
       setTimeLeft={setTimeLeft}
       setQuitLastGame={setQuitLastGame}

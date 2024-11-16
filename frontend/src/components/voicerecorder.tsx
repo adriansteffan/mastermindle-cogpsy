@@ -8,13 +8,6 @@ interface AudioVisualizerProps {
   stream: MediaStream;
 }
 
-interface VoiceRecorderProps {
-  question: {
-    value: RecordingData | null;
-  };
-  handleSaveVoiceData: (data: object) => void;
-}
-
 interface RecordingData {
   blob: Blob;
   url: string;
@@ -172,11 +165,26 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({ stream }) => {
   }, [stream]);
 
   return (
-    <canvas ref={canvasRef} width={300} height={60} className='rounded-lg bg-white shadow-sm' />
+    <canvas
+      ref={canvasRef}
+      width={300}
+      height={60}
+      className='mx-auto rounded-lg bg-white shadow-sm'
+    />
   );
 };
 
-export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ question, handleSaveVoiceData }) => {
+export const VoiceRecorder = ({
+  question,
+  handleSaveVoiceData,
+  handleDiscardVoiceData,
+}: {
+  question: {
+    value: RecordingData | null;
+  };
+  handleSaveVoiceData: (data: object) => void;
+  handleDiscardVoiceData: () => void;
+}) => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
@@ -185,7 +193,19 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ question, handleSa
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      /*This is really hacky but it works and there is a deadline, we should find a way to pass around such values in the future */
+      /*eslint-disable-next-line @typescript-eslint/no-explicit-any*/
+      const deviceId = (window as any).audioInputId;
+      const constraints: MediaStreamConstraints = {
+        audio: deviceId
+          ? {
+              deviceId: { exact: deviceId },
+            }
+          : true,
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
       setAudioStream(stream);
       mediaRecorderRef.current = new MediaRecorder(stream);
       chunksRef.current = [];
@@ -235,6 +255,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ question, handleSa
     }
     setAudioUrl(null);
     question.value = null;
+    handleDiscardVoiceData();
   };
 
   return (
@@ -243,18 +264,22 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ question, handleSa
       {!audioUrl && (
         <button
           onClick={isRecording ? stopRecording : startRecording}
-          className={`flex items-center justify-center space-x-2 p-4 rounded-full 
-              ${isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} 
+          className={`flex items-center justify-center space-x-2 p-4 rounded-full border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none cursor-pointer
+              ${isRecording ? 'bg-red-500 hover:bg-red-600' : ''} 
               text-white transition-colors duration-200`}
           aria-label={isRecording ? 'Stop Recording' : 'Start Recording'}
         >
-          {isRecording ? <HiStop className='w-6 h-6' /> : <HiMicrophone className='w-6 h-6' />}
+          {isRecording ? (
+            <HiStop className='w-6 h-6' />
+          ) : (
+            <HiMicrophone className='w-6 h-6 text-black' />
+          )}
         </button>
       )}
 
       {/* Audio visualizer */}
       {isRecording && audioStream && (
-        <div className='w-full max-w-md'>
+        <div className='w-full max-w-md mx-auto'>
           <AudioVisualizer stream={audioStream} />
         </div>
       )}
@@ -263,7 +288,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ question, handleSa
       {isRecording && (
         <div className='flex items-center space-x-2'>
           <div className='w-3 h-3 bg-red-500 rounded-full animate-pulse'></div>
-          <span className='text-sm text-gray-600'>Recording...</span>
+          <span className='text-sm text-black'>Recording...</span>
         </div>
       )}
 
@@ -275,8 +300,8 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ question, handleSa
           <div className='flex space-x-4'>
             <button
               onClick={discardRecording}
-              className='flex items-center space-x-2 px-4 py-2 bg-red-500 
-                         hover:bg-red-600 text-white rounded transition-colors duration-200'
+              className='border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none cursor-pointer flex items-center space-x-2 px-4 py-2 text-black
+                        rounded-xl transition-colors duration-200'
             >
               <HiTrash className='w-4 h-4' />
               <span>Discard</span>
@@ -305,7 +330,6 @@ Serializer.addClass(
   'question',
 );
 
-
 export default class VoiceRecorderQuestion extends SurveyQuestionElementBase {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(props: any) {
@@ -321,6 +345,11 @@ export default class VoiceRecorderQuestion extends SurveyQuestionElementBase {
     this.question.value = data;
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  handleDiscardVoiceData = () => {
+    this.question.value = null;
+  };
+
   get style() {
     return this.question.getPropertyValue('readOnly') || this.question.isDesignMode
       ? { pointerEvents: 'none' }
@@ -329,7 +358,11 @@ export default class VoiceRecorderQuestion extends SurveyQuestionElementBase {
 
   renderElement() {
     return (
-      <VoiceRecorder question={{ value: null }} handleSaveVoiceData={this.handleSaveVoiceData} />
+      <VoiceRecorder
+        question={{ value: null }}
+        handleSaveVoiceData={this.handleSaveVoiceData}
+        handleDiscardVoiceData={this.handleDiscardVoiceData}
+      />
     );
   }
 }
