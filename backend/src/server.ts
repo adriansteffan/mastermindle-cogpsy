@@ -62,9 +62,6 @@ app.post(
 
       const data = req.body as UploadData;
 
-      fs.writeFile('/srv/backend/data/test.txt', 'hello world');
-      fs.writeFile(path.join(backendFolder, 'test2.txt'), 'hello world');
-
       const dataDir = path.join(backendFolder, data.sessionId);
       const audioDir = path.join(dataDir, 'audio');
       await fs.mkdir(dataDir, { recursive: true });
