@@ -88,8 +88,6 @@ the resulting output can be found in `frontend/dist/`
 
 #### Installing
 
-#### Databases & Supertokens Setup
-
 Run 
 
 ```
@@ -125,24 +123,6 @@ the resulting output can be found in `backend/dist/` and can be run with
 ```
 npm run prod
 ```
-
-
-## Built with
-
-When developing, install [prettier](https://prettier.io/) in VS Code
-
-* [Typescript](https://www.typescriptlang.org/)
-
-* [Vite](https://vitejs.dev/)
-* [React](https://react.dev/)
-* [React Query](https://tanstack.com/query/v3/)
-* [TailwindCSS](https://tailwindcss.com/)
-
-* [Node](https://nodejs.org/en)
-* [Express](https://expressjs.com/)
-* [Express Validator](https://express-validator.github.io/docs/)
-* [Multer](https://www.npmjs.com/package/multer)
-* [morgan](https://github.com/expressjs/morgan)
 
 
 ## Authors
