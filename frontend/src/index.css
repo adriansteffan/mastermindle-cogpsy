@@ -45,9 +45,9 @@ body {
   font-style: italic;
 }
 
-/* customization for the surveyjs elements*/
+/* customization for the surveyjs elements - a bit hacky and broken*/
 .sd-root-modern {
-  background-color: white;
+  background-color: white !important;
   background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
   background-size: 16px 16px;
   position: relative; /* Make sure position is set for proper rendering */
@@ -61,7 +61,7 @@ body {
 /* for the rating group panel, maybe we can move that into the component at some point*/
 .sd-row,
 .sd-clearfix {
-  padding-bottom: 20px;
+  padding-bottom: 20px !important;
 }
 
 /* fix pet peeve in surveyjs */
