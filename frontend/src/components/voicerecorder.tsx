@@ -243,6 +243,8 @@ export const VoiceRecorder = ({
     if (blob && url) {
       handleSaveVoiceData({
         blob: blob,
+        // dont change this type, since the upload function depends on it while looking for audio. we might want to refactor this at some point 
+        type: 'audiorecording',
         url: url,
         timestamp: new Date().toISOString(),
       });

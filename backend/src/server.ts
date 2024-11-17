@@ -1,7 +1,7 @@
-import express, { Express, Request, Response, Application } from 'express';
+import express, { Request, Response, Application } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { body, matchedData, validationResult, query } from 'express-validator';
+import { body, validationResult } from 'express-validator';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -13,6 +13,7 @@ const backendFolder = process.env.BACKEND_FOLDER ?? 'files';
 
 const app: Application = express();
 
+
 app.use(
   cors({
     origin: [frontendURL, `http://localhost:${process.env.VITE_FRONTEND_PROD_CONTAINER}`],
@@ -22,21 +23,28 @@ app.use(
   })
 );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 const PORT = process.env.BACKEND_PORT || 8000;
 
 
-interface FileData {
-  type: string;
-  content: string;
+interface AudioFile {
+  blockPos: number;
+  gameIndex: number;
+  base64Data: string;
+  filename: string;
 }
 
 interface UploadData {
   sessionId: string;
-  files: FileData[];
+  files: {
+    type: string;
+    content: string;
+  }[];
+  audioFiles: AudioFile[];
 }
+
 
 app.post(
   '/data',
@@ -44,6 +52,7 @@ app.post(
   body('files').isArray(),
   body('files.*.type').isString(),
   body('files.*.content').isString(),
+  body('audioFiles').isArray(),
   async (req: Request, res: Response) => {
     try {
       const result = validationResult(req);
@@ -53,39 +62,28 @@ app.post(
 
       const data = req.body as UploadData;
       
-      await fs.mkdir(backendFolder, { recursive: true });
+      const dataDir = path.join(backendFolder, data.sessionId);
+      const audioDir = path.join(dataDir, 'audio');
+      await fs.mkdir(dataDir, { recursive: true });
+      await fs.mkdir(audioDir, { recursive: true });
 
-      // Save each file with collision handling
-      const savePromises = data.files.map(async (file) => {
-        const baseFilename = `${data.sessionId}_${file.type}`;
-        let filename = `${baseFilename}.csv`;
-        let counter = 0;
-        
-        while (true) {
-          try {
-            const filePath = path.join(backendFolder, filename);
-            await fs.writeFile(filePath, file.content, { 
-              flag: 'wx', // exclusive write flag
-              encoding: 'utf8'
-            });
-            break;
-          } catch (error: any) {
-            
-            if (error.code === 'EEXIST') {
-              counter++;
-              filename = `${baseFilename}_${counter}.csv`;
-            } else {
-              throw error;
-            }
-          }
-        }
+      const saveFilePromises = data.files.map(async (file) => {
+        const filename = `${data.sessionId}_${file.type}.csv`;
+        const filePath = path.join(dataDir, filename);
+        await fs.writeFile(filePath, file.content, { encoding: 'utf8' });
       });
 
-      await Promise.all(savePromises);
+      const saveAudioPromises = data.audioFiles.map(async (audioFile) => {
+        const filePath = path.join(audioDir, audioFile.filename);
+        const buffer = Buffer.from(audioFile.base64Data, 'base64');
+        await fs.writeFile(filePath, buffer as any);
+      });
+
+      await Promise.all([...saveFilePromises, ...saveAudioPromises]);
 
       return res.status(200).json({ 
         status: 200, 
-        message: 'Data saved successfully' 
+        message: 'Data and audio files saved successfully' 
       });
     } catch (error) {
       console.error('Error saving data:', error);

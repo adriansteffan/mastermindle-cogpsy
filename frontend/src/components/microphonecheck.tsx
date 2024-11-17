@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { VoiceRecorder } from './voicerecorder';
 
 interface MicrophoneDevice {
@@ -39,7 +39,7 @@ export function MicrophoneSelect({
       .catch((err) => {
         console.error('Error accessing microphone:', err);
       });
-  }, []);
+  }, [onMicrophoneSelect, selectedMic]);
 
   const handleSelect = (deviceId: string) => {
     setSelectedMic(deviceId);

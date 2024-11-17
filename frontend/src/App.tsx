@@ -201,10 +201,10 @@ const experiment = [
   //     ),
   //   },
   // },
-  {
-    name: 'miccheck',
-    type: 'MicrophoneCheck',
-  },
+  // {
+  //   name: 'miccheck',
+  //   type: 'MicrophoneCheck',
+  // },
   // {
   //   name: 'explanationtext',
   //   type: 'Text',
@@ -360,13 +360,13 @@ const experiment = [
                 //   minRateDescription: 'Oh',
                 //   maxRateDescription: 'no',
                 // },
-                // {
-                //   type: 'voicerecorder',
-                //   name: 'senseofeffort',
-                //   title:
-                //     'Please describe how would design a question targetted at extracting: Sense of effort, qualitative question (Question Mising)',
-                //   isRequired: true,
-                // },
+                {
+                  type: 'voicerecorder',
+                  name: 'senseofeffort',
+                  title:
+                    'Please describe how would design a question targetted at extracting: Sense of effort, qualitative question (Question Missing)',
+                  isRequired: true,
+                },
                 // {
                 //   type: 'voicerecorder',
                 //   name: 'strategyusage',
@@ -426,49 +426,49 @@ const experiment = [
         pages: [
           {
             elements: [
-              {
-                // self made matrix because the provided one is trash
-                type: 'panel',
-                name: 'ncs_6',
-                title:
-                  'For each sentence below, please select how uncharacteristic or characteristic this is for you personally.',
+              // {
+              //   // self made matrix because the provided one is trash
+              //   type: 'panel',
+              //   name: 'ncs_6',
+              //   title:
+              //     'For each sentence below, please select how uncharacteristic or characteristic this is for you personally.',
 
-                elements: shuffleArray([
-                  {
-                    value: 'complex_problems',
-                    text: 'I would prefer complex to simple problems.',
-                  },
-                  {
-                    value: 'thinking_responsibility',
-                    text: 'I like to have the responsibility of handling a situation that requires a lot of thinking.',
-                  },
-                  {
-                    value: 'thinking_fun_r',
-                    text: 'Thinking is not my idea of fun.',
-                  },
-                  {
-                    value: 'little_thought_r',
-                    text: 'I would rather do something that requires little thought than something that is sure to challenge my thinking abilities.',
-                  },
-                  {
-                    value: 'new_solutions',
-                    text: 'I really enjoy a task that involves coming up with new solutions to problems.',
-                  },
-                  {
-                    value: 'intellectual_task',
-                    text: 'I would prefer a task that is intellectual, difficult, and important to one that is somewhat important but does not require much thought.',
-                  },
-                ]).map((row) => ({
-                  type: 'rating',
-                  name: `ncs_6_${row.value}`,
-                  title: row.text,
-                  isRequired: true,
-                  rateMin: 1,
-                  rateMax: 5,
-                  minRateDescription: 'Extremely uncharacteristic',
-                  maxRateDescription: 'Extremely characteristic',
-                })),
-              },
+              //   elements: shuffleArray([
+              //     {
+              //       value: 'complex_problems',
+              //       text: 'I would prefer complex to simple problems.',
+              //     },
+              //     {
+              //       value: 'thinking_responsibility',
+              //       text: 'I like to have the responsibility of handling a situation that requires a lot of thinking.',
+              //     },
+              //     {
+              //       value: 'thinking_fun_r',
+              //       text: 'Thinking is not my idea of fun.',
+              //     },
+              //     {
+              //       value: 'little_thought_r',
+              //       text: 'I would rather do something that requires little thought than something that is sure to challenge my thinking abilities.',
+              //     },
+              //     {
+              //       value: 'new_solutions',
+              //       text: 'I really enjoy a task that involves coming up with new solutions to problems.',
+              //     },
+              //     {
+              //       value: 'intellectual_task',
+              //       text: 'I would prefer a task that is intellectual, difficult, and important to one that is somewhat important but does not require much thought.',
+              //     },
+              //   ]).map((row) => ({
+              //     type: 'rating',
+              //     name: `ncs_6_${row.value}`,
+              //     title: row.text,
+              //     isRequired: true,
+              //     rateMin: 1,
+              //     rateMax: 5,
+              //     minRateDescription: 'Extremely uncharacteristic',
+              //     maxRateDescription: 'Extremely characteristic',
+              //   })),
+              // },
               {
                 type: 'imagepicker',
                 name: 'choosefeedback',
@@ -501,12 +501,12 @@ const experiment = [
                   },
                 ],
               },
-              // {
-              //   type: 'voicerecorder',
-              //   name: 'whychoosefeedback',
-              //   title: 'Why did you choose this option?',
-              //   isRequired: true,
-              // },
+              {
+                type: 'voicerecorder',
+                name: 'whychoosefeedback',
+                title: 'Why did you choose this option?',
+                isRequired: true,
+              },
             ],
           },
         ],
