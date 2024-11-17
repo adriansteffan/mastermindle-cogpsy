@@ -546,7 +546,7 @@ function MasterMindleWrapper({
   next,
   blockIndex,
   feedback,
-  timeLimit = 10,
+  timeLimit = 120,
   maxGuesses = 10,
 }: {
   next: (data: object) => void;
