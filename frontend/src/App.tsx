@@ -317,7 +317,7 @@ const experiment = [
     },
   ]).flatMap((block, blockindex) => [
     {
-      name: `block_${block.feedbacktype}_text`,
+      name: `blocktype${block.feedbacktype}_blockindex${blockindex}_text`,
       type: 'Text',
       props: {
         buttonText: 'Start',
@@ -325,15 +325,15 @@ const experiment = [
       },
     },
     {
-      name: `block_${block.feedbacktype}_mastermindle`,
+      name: `blocktype${block.feedbacktype}_blockindex${blockindex}_mastermindle`,
       type: 'MasterMindleWrapper',
       props: {
-        blockpos: `${blockindex}`,
+        blockIndex: `${blockindex}`,
         feedback: block.feedbacktype,
       },
     },
     {
-      name: `block_${block.feedbacktype}_survey`,
+      name: `blocktype${block.feedbacktype}_blockindex${blockindex}_survey`,
       type: 'Quest',
       props: {
         surveyJson: {
@@ -343,7 +343,8 @@ const experiment = [
                 {
                   type: 'rating',
                   name: 'enjoyment',
-                  title: 'Game completed! How much did you enjoy solving the tasks with this feedback variant?',
+                  title:
+                    'Game completed! How much did you enjoy solving the tasks with this feedback variant?',
                   isRequired: true,
                   rateMin: 1,
                   rateMax: 6,
@@ -426,49 +427,49 @@ const experiment = [
         pages: [
           {
             elements: [
-              // {
-              //   // self made matrix because the provided one is trash
-              //   type: 'panel',
-              //   name: 'ncs_6',
-              //   title:
-              //     'For each sentence below, please select how uncharacteristic or characteristic this is for you personally.',
+              {
+                // self made matrix because the provided one is trash
+                type: 'panel',
+                name: 'ncs_6',
+                title:
+                  'For each sentence below, please select how uncharacteristic or characteristic this is for you personally.',
 
-              //   elements: shuffleArray([
-              //     {
-              //       value: 'complex_problems',
-              //       text: 'I would prefer complex to simple problems.',
-              //     },
-              //     {
-              //       value: 'thinking_responsibility',
-              //       text: 'I like to have the responsibility of handling a situation that requires a lot of thinking.',
-              //     },
-              //     {
-              //       value: 'thinking_fun_r',
-              //       text: 'Thinking is not my idea of fun.',
-              //     },
-              //     {
-              //       value: 'little_thought_r',
-              //       text: 'I would rather do something that requires little thought than something that is sure to challenge my thinking abilities.',
-              //     },
-              //     {
-              //       value: 'new_solutions',
-              //       text: 'I really enjoy a task that involves coming up with new solutions to problems.',
-              //     },
-              //     {
-              //       value: 'intellectual_task',
-              //       text: 'I would prefer a task that is intellectual, difficult, and important to one that is somewhat important but does not require much thought.',
-              //     },
-              //   ]).map((row) => ({
-              //     type: 'rating',
-              //     name: `ncs_6_${row.value}`,
-              //     title: row.text,
-              //     isRequired: true,
-              //     rateMin: 1,
-              //     rateMax: 5,
-              //     minRateDescription: 'Extremely uncharacteristic',
-              //     maxRateDescription: 'Extremely characteristic',
-              //   })),
-              // },
+                elements: shuffleArray([
+                  {
+                    value: 'complex_problems',
+                    text: 'I would prefer complex to simple problems.',
+                  },
+                  {
+                    value: 'thinking_responsibility',
+                    text: 'I like to have the responsibility of handling a situation that requires a lot of thinking.',
+                  },
+                  {
+                    value: 'thinking_fun_r',
+                    text: 'Thinking is not my idea of fun.',
+                  },
+                  {
+                    value: 'little_thought_r',
+                    text: 'I would rather do something that requires little thought than something that is sure to challenge my thinking abilities.',
+                  },
+                  {
+                    value: 'new_solutions',
+                    text: 'I really enjoy a task that involves coming up with new solutions to problems.',
+                  },
+                  {
+                    value: 'intellectual_task',
+                    text: 'I would prefer a task that is intellectual, difficult, and important to one that is somewhat important but does not require much thought.',
+                  },
+                ]).map((row) => ({
+                  type: 'rating',
+                  name: `ncs_6_${row.value}`,
+                  title: row.text,
+                  isRequired: true,
+                  rateMin: 1,
+                  rateMax: 5,
+                  minRateDescription: 'Extremely uncharacteristic',
+                  maxRateDescription: 'Extremely characteristic',
+                })),
+              },
               {
                 type: 'imagepicker',
                 name: 'choosefeedback',
@@ -619,7 +620,7 @@ export default function App() {
         end: currentTime,
         duration: currentTime - trialStartTime,
       };
-
+      console.log([...data, trialData]);
       setData([...data, trialData]);
     }
 

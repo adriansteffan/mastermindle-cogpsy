@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMutation } from 'react-query';
 import { v4 as uuidv4 } from 'uuid';
 import { post } from '../utils/request';
-import { convertToCSV, StudyEvent } from '../utils/csv';
+import { convertData, StudyEvent } from '../utils/convert';
 
 async function blobUrlToBase64(blobUrl: string): Promise<string> {
   const response = await fetch(blobUrl);
@@ -21,84 +21,25 @@ async function blobUrlToBase64(blobUrl: string): Promise<string> {
 }
 
 interface AudioFile {
-  eventIndex: number;
-  eventType: string;
-  eventName: string;
-  questionName: string;
   base64Data: string;
   filename: string;
-  timestamp: string;
 }
 
-async function findAndProcessAudioRecordings(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  obj: any,
-  eventInfo: { index: number; type: string; name: string },
-): Promise<AudioFile[]> {
-  const audioFiles: AudioFile[] = [];
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async function processAudioObj(fieldName: string, audioObj: any): Promise<AudioFile | null> {
-    if (audioObj.type === 'audiorecording' && audioObj.url?.startsWith('blob:')) {
-      try {
-        const base64Data = await blobUrlToBase64(audioObj.url);
-        return {
-          eventIndex: eventInfo.index,
-          eventType: eventInfo.type,
-          eventName: eventInfo.name,
-          questionName: fieldName,
-          base64Data,
-          filename: `${eventInfo.type}_${eventInfo.name}_${fieldName}_${eventInfo.index}.wav`,
-          timestamp: audioObj.timestamp,
-        };
-      } catch (error) {
-        console.error(`Error processing audio recording for ${fieldName}:`, error);
-        return null;
-      }
-    }
-    return null;
-  }
-
-  for (const [key, value] of Object.entries(obj)) {
-    if (value && typeof value === 'object') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((value as any).type === 'audiorecording') {
-        const audioFile = await processAudioObj(key, value);
-        if (audioFile) {
-          audioFiles.push(audioFile);
-        }
-      } else {
-        // Recursively search nested objects and arrays
-        if (Array.isArray(value)) {
-          for (let i = 0; i < value.length; i++) {
-            if (typeof value[i] === 'object' && value[i] !== null) {
-              const nestedFiles = await findAndProcessAudioRecordings(value[i], {
-                ...eventInfo,
-                name: `${eventInfo.name}_item${i}`,
-              });
-              audioFiles.push(...nestedFiles);
-            }
-          }
-        } else {
-          const nestedFiles = await findAndProcessAudioRecordings(value, eventInfo);
-          audioFiles.push(...nestedFiles);
-        }
-      }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function processAudioObj(name: string, audioUrl: any): Promise<AudioFile | null> {
+  if (audioUrl.startsWith('blob:')) {
+    try {
+      const base64Data = await blobUrlToBase64(audioUrl);
+      return {
+        base64Data,
+        filename: `${name}.wav`
+      };
+    } catch (error) {
+      console.error(`Error processing audio recording for ${name}:`, error);
+      return null;
     }
   }
-
-  return audioFiles;
-}
-
-async function extractAudioFiles(studyData: StudyEvent[]): Promise<AudioFile[]> {
-  const audioFiles: AudioFile[] = [];
-
-  for (const event of studyData) {
-    const eventAudioFiles = await findAndProcessAudioRecordings(event.data, event);
-    audioFiles.push(...eventAudioFiles);
-  }
-
-  return audioFiles;
+  return null;
 }
 
 interface UploadPayload {
@@ -141,29 +82,41 @@ export default function Upload({ data, next }: { data: StudyEvent[]; next: () =>
 
   const handleUpload = async () => {
     setUploadState('uploading');
-    const csvData = convertToCSV(data);
+
+    const convertedData = convertData(data);
     const sessionId = uuidv4();
 
-    console.log(data);
-    console.log(JSON.stringify(data));
+    const audioFiles: AudioFile[] = [];
+
     try {
-      const audioFiles = await extractAudioFiles(data);
-      console.log('Extracted audio files:', audioFiles.length);
+      for (const audiodata of convertedData.audios) {
+        const audioFile = await processAudioObj(audiodata.name, audiodata.url);
+        if (audioFile) {
+          audioFiles.push(audioFile);
+        }
+      }
+    } catch (error) {
+      console.error('Error processing audio files:', error);
+      setUploadState('error');
+    }
+
+    try {
+      //console.log('Extracted audio files:', audioFiles.length);
 
       const payload: UploadPayload = {
         sessionId,
         files: [
-          { type: 'global', content: csvData.globalCsv },
-          { type: 'block', content: csvData.blockCsv },
-          { type: 'game', content: csvData.gameCsv },
-          { type: 'guess', content: csvData.guessCsv },
+          { type: 'global', content: convertedData.globalCsv },
+          { type: 'block', content: convertedData.blockCsv },
+          { type: 'game', content: convertedData.gameCsv },
+          { type: 'guess', content: convertedData.guessCsv },
         ],
         audioFiles,
       };
 
       uploadData.mutate(payload);
     } catch (error) {
-      console.error('Error processing audio files:', error);
+      console.error('Error uploading:', error);
       setUploadState('error');
     }
   };

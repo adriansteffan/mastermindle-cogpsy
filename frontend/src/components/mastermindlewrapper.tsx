@@ -544,13 +544,13 @@ interface MMTrialData {
 
 function MasterMindleWrapper({
   next,
-  blockpos,
+  blockIndex,
   feedback,
   timeLimit = 10,
   maxGuesses = 10,
 }: {
   next: (data: object) => void;
-  blockpos: number;
+  blockIndex: number;
   feedback: 1 | 2 | 3 | 4 | 5;
   timeLimit: number;
   maxGuesses: number;
@@ -572,20 +572,19 @@ function MasterMindleWrapper({
       end: currentTime,
       duration: currentTime - trialStartTime,
       data: newData,
-      ...(gameState === 'survey' && { quitLastGame }),
     };
-
-    setAccumulatedData((prev) => [...prev, trialData]);
 
     if (gameState === 'survey' && timeLeft <= 0) {
       next({
-        blockpos: blockpos,
+        blockIndex: blockIndex,
         feedbacktype: feedback,
         timelimit_s: timeLimit,
-        data: accumulatedData,
+        data: [...accumulatedData, trialData],
       });
       return;
     }
+
+    setAccumulatedData((prev) => [...prev, trialData]);
 
     if (gameState === 'survey') {
       setQuitLastGame(false);

@@ -30,8 +30,6 @@ const PORT = process.env.BACKEND_PORT || 8000;
 
 
 interface AudioFile {
-  blockPos: number;
-  gameIndex: number;
   base64Data: string;
   filename: string;
 }
@@ -66,8 +64,6 @@ app.post(
       const audioDir = path.join(dataDir, 'audio');
       await fs.mkdir(dataDir, { recursive: true });
       await fs.mkdir(audioDir, { recursive: true });
-
-  
 
       const saveFilePromises = data.files.map(async (file) => {
         const filename = `${data.sessionId}_${file.type}.csv`;

@@ -29,17 +29,32 @@ function Quest({ next, surveyJson }: { next: (data: object) => void; surveyJson:
   const survey = new Model({ ...surveyJson, css: myCustomTheme });
   survey.applyTheme(ContrastLight);
 
-  const alertResults = useCallback(
+  const saveResults = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (sender: any) => {
-      next(sender.data);
+      const resultData = [];
+      for (const key in sender.data) {
+        const question = sender.getQuestionByName(key);
+        if (question) {
+          const item = {
+            name: key,
+            type: question.jsonObj.type,
+            value: question.value,
+            //title: question.displayValue,
+            //displayValue: question.displayValue,
+          };
+          resultData.push(item);
+        }
+      }
+
+      next(resultData);
     },
     [next],
   );
 
-  survey.onComplete.add(alertResults);
+  survey.onComplete.add(saveResults);
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className='max-w-4xl mx-auto'>
       <div className='absolute inset-0 -z-10 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]'></div>
       <Survey model={survey} />
     </div>
