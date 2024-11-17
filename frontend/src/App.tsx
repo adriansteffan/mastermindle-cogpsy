@@ -331,7 +331,7 @@ const experiment = [
         blockIndex: `${blockindex}`,
         feedback: block.feedbacktype,
         timeLimit: 120,
-        maxGuesses: 10,
+        maxGuesses: 8,
       },
     },
     {

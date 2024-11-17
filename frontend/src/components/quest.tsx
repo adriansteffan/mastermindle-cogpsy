@@ -1,7 +1,7 @@
 import 'survey-core/defaultV2.min.css';
 import { defaultV2Css, Model } from 'survey-core';
 import { ReactQuestionFactory, Survey } from 'survey-react-ui';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { ContrastLight } from 'survey-core/themes';
 
@@ -29,6 +29,10 @@ function Quest({ next, surveyJson }: { next: (data: object) => void; surveyJson:
   const survey = new Model({ ...surveyJson, css: myCustomTheme });
   survey.applyTheme(ContrastLight);
 
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+  
   const saveResults = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (sender: any) => {
