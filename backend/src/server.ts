@@ -61,11 +61,15 @@ app.post(
       }
 
       const data = req.body as UploadData;
-      
+
+      console.log("creating folders")
+
       const dataDir = path.join(backendFolder, data.sessionId);
       const audioDir = path.join(dataDir, 'audio');
       await fs.mkdir(dataDir, { recursive: true });
       await fs.mkdir(audioDir, { recursive: true });
+
+      console.log("created folders")
 
       const saveFilePromises = data.files.map(async (file) => {
         const filename = `${data.sessionId}_${file.type}.csv`;
