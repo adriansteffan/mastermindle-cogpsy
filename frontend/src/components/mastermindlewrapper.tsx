@@ -138,6 +138,9 @@ function MasterMindle({
   }, [maxTime]);
 
   useEffect(() => {
+    // Only start the timer if the round is not over
+    if (roundOver) return;
+
     const timer = setInterval(() => {
       setLocalTimeLeft((prev) => {
         const newTime = Math.max(0, prev - 1);
@@ -161,8 +164,9 @@ function MasterMindle({
       });
     }, 1000);
 
+    // Cleanup timer when component unmounts or roundOver changes
     return () => clearInterval(timer);
-  }, [setLocalTimeLeft]);
+  }, [roundOver, setLocalTimeLeft]);
 
   const [previousGuesses, setPreviousGuesses] = useState<
     { colors: ColorKey[]; results: GuessResult[] }[]
