@@ -622,7 +622,7 @@ export default function App() {
         end: currentTime,
         duration: currentTime - trialStartTime,
       };
-      console.log([...data, trialData]);
+      //console.log([...data, trialData]);
       setData([...data, trialData]);
     }
 
