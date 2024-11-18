@@ -57,8 +57,6 @@ const ColorOrb: React.FC<ColorOrbProps> = ({
   };
 
   const handleTouchEnd = (e: React.MouseEvent | React.TouchEvent) => {
-    
-
     e.preventDefault();
   };
 
@@ -351,7 +349,7 @@ function MasterMindle({
         )}
         {roundOver && (
           <button
-            className='bg-white px-6 md:px-8 py-1 md:py-3 text-sm md:text-lg border-2 border-black font-bold border-2 border-black text-black rounded-full shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+            className='bg-white px-6 md:px-8 py-3 md:py-3 text-sm md:text-lg border-2 border-black font-bold text-black rounded-full shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
             onClick={() => {
               handleNext(false);
             }}
@@ -359,14 +357,15 @@ function MasterMindle({
             NEXT
           </button>
         )}
+        
       </div>
 
       {/* Gameboard */}
-      <div className='flex flex-col  justify-between order-first items-center lg:order-none min-h-0'>
-        <div className='space-y-4 md:space-y-8 flex-1'>
+      <div className='flex flex-col justify-between order-first items-center lg:order-none min-h-0'>
+        <div className='space-y-4 -mt-8 sm:mt-0 md:space-y-8 flex-1'>
           {/* Timer */}
-          <div className='flex justify-between items-center gap-6'>
-            <div className='text-2xl font-bold w-20 text-left'>
+          <div className='flex justify-center items-center gap-6'>
+            <div className='text-lg text-center sm:text-2xl font-bold w-20 sm:text-left'>
               {Math.floor(localTimeLeft / 60)}:{(localTimeLeft % 60).toString().padStart(2, '0')}
             </div>
           </div>
