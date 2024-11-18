@@ -69,3 +69,4 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+output/

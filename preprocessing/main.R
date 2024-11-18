@@ -68,12 +68,19 @@ effort_per_block <- big_table %>%
    group_by(participant_id, blockIndex, feedbacktype) %>% 
    summarize(mean_effort = mean(intensityofeffort), sd_effort = sd(intensityofeffort))
 
-experiment_data <- times_per_trial_and_block %>% 
-  inner_join(times_per_guess, by = join_by(participant_id, blockIndex, feedbacktype)) %>% 
-  inner_join(trials_per_block, by = join_by(participant_id, blockIndex, feedbacktype)) %>% 
-  inner_join(guesses_per_block, by = join_by(participant_id, blockIndex, feedbacktype)) %>% 
-  inner_join(effort_per_block, by = join_by(participant_id, blockIndex, feedbacktype))
+
+join_cols <- c("participant_id", "blockIndex", "feedbacktype")
+experiment_data <- list(
+  times_per_trial_and_block,
+  times_per_guess,
+  trials_per_block,
+  guesses_per_block,
+  effort_per_block,
+  block_data %>% select(-c(index,type,name,duration,start,end))
+) %>% 
+  reduce(\(agg, nxt){inner_join(agg, nxt, by = join_cols)})
 
 
-#write_csv(experiment_data, './blockdata.csv')
-#write_csv(participant_data, './participantdata.csv')
+dir.create('./output')
+write_csv(experiment_data, './output/blockdata.csv')
+write_csv(participant_data, './output/participantdata.csv')
