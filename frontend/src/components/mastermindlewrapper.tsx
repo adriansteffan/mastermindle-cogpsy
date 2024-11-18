@@ -51,6 +51,17 @@ const ColorOrb: React.FC<ColorOrbProps> = ({
     32: 'h-32 w-32 text-4xl',
   }[size];
 
+  const handleInteraction = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault(); // Prevent double-firing on mobile devices
+    onClick?.();
+  };
+
+  const handleTouchEnd = (e: React.MouseEvent | React.TouchEvent) => {
+    
+
+    e.preventDefault();
+  };
+
   return (
     <div
       style={{
@@ -65,11 +76,13 @@ const ColorOrb: React.FC<ColorOrbProps> = ({
         border-2
         border-black
         
-        ${interactive ? ' shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none cursor-pointer' : `border-[${size / 8}px]`}
+        ${interactive ? ' shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none cursor-pointer touch-manipulation' : `border-[${size / 8}px]`}
         ${pressed ? ' translate-x-[2px] translate-y-[2px] shadow-none' : ''}
         ${hoverborder ? ' hover:border-4 cursor-pointer' : ''}
       `}
-      onClick={onClick}
+      onClick={handleInteraction}
+      onTouchStart={handleInteraction}
+      onTouchEnd={handleTouchEnd}
     >
       {letter}
     </div>
@@ -304,7 +317,7 @@ function MasterMindle({
   };
 
   return (
-    <div className='mt-16 md:p-8 lg:mt-16 max-w-7xl h-[calc(100vh-200px)] lg:h-full w-fit mx-auto flex flex-col lg:flex-row xl:gap-x-12 lg:gap-x-8 justify-between lg:justify-center'>
+    <div className='mt-16 md:p-8 lg:mt-16 max-w-7xl h-[calc(100vh-230px)] lg:h-full w-fit mx-auto flex flex-col lg:flex-row xl:gap-x-12 lg:gap-x-8 justify-between lg:justify-center'>
       <div className='absolute inset-0 -z-10 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]'></div>
 
       {/* Action Buttons */}
@@ -350,7 +363,7 @@ function MasterMindle({
 
       {/* Gameboard */}
       <div className='flex flex-col  justify-between order-first items-center lg:order-none min-h-0'>
-        <div className='space-y-8 flex-1'>
+        <div className='space-y-4 md:space-y-8 flex-1'>
           {/* Timer */}
           <div className='flex justify-between items-center gap-6'>
             <div className='text-2xl font-bold w-20 text-left'>
