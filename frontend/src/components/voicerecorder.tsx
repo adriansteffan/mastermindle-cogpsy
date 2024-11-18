@@ -269,8 +269,6 @@ export const VoiceRecorder = ({
       {!audioUrl && (
         <button
           onClick={isRecording ? stopRecording : startRecording}
-          onTouchStart={isRecording ? stopRecording : startRecording}
-          onTouchEnd={e => e.preventDefault}
           className={`flex items-center justify-center space-x-2 p-4 rounded-full border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none cursor-pointer
               ${isRecording ? 'bg-red-500 hover:bg-red-600' : ''} 
               text-white transition-colors duration-200`}
