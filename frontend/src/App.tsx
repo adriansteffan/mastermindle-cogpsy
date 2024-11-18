@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Upload from './components/upload';
 import Text from './components/text';
@@ -602,6 +602,10 @@ export default function App() {
   const [trialCounter, setTrialCounter] = useState(0);
   const [data, setData] = useState<TrialData[]>([]);
   const [trialStartTime, setTrialStartTime] = useState(now());
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [trialCounter])
 
   function next(newData?: object): void {
     const currentTime = now();
