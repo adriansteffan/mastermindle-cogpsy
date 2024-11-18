@@ -191,6 +191,7 @@ export const VoiceRecorder = ({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
 
+  
   const startRecording = async () => {
     try {
       /*This is really hacky but it works and there is a deadline, we should find a way to pass around such values in the future */
@@ -208,6 +209,7 @@ export const VoiceRecorder = ({
 
       setAudioStream(stream);
       mediaRecorderRef.current = new MediaRecorder(stream);
+
       chunksRef.current = [];
 
       mediaRecorderRef.current.ondataavailable = (e: BlobEvent) => {
@@ -225,6 +227,7 @@ export const VoiceRecorder = ({
       };
 
       mediaRecorderRef.current.start();
+
       setIsRecording(true);
     } catch (err) {
       console.error('Error accessing microphone:', err);
@@ -243,7 +246,7 @@ export const VoiceRecorder = ({
     if (blob && url) {
       handleSaveVoiceData({
         blob: blob,
-        // dont change this type, since the upload function depends on it while looking for audio. we might want to refactor this at some point 
+        // dont change this type, since the upload function depends on it while looking for audio. we might want to refactor this at some point
         type: 'audiorecording',
         url: url,
         timestamp: new Date().toISOString(),
@@ -297,7 +300,16 @@ export const VoiceRecorder = ({
       {/* Audio player and action buttons */}
       {audioUrl && !isRecording && (
         <div className='flex flex-col items-center space-y-4 w-full max-w-md'>
-          <audio src={audioUrl} controls className='w-full' />
+          <audio
+            controls
+            preload='none'
+            className='w-full'
+            playsInline 
+          >
+            <source src={audioUrl} type='audio/mp4' />
+            <source src={audioUrl} type='audio/webm' />
+            Your browser does not support the audio element.
+          </audio>
 
           <div className='flex space-x-4'>
             <button
