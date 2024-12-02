@@ -3,6 +3,18 @@ import { Bounce, toast } from 'react-toastify';
 import Quest from './quest';
 import { now } from '../utils/timing';
 
+/**
+ * 1: Correct/Wrong
+ * 2: How many are correct/wrong
+ * 3: how many correct/wrong + how many colors did you get that are needed elsewhere
+ * 3a: how many correct/wrong + how many fields have a wrong color that is needed elsewhere
+ * 4: what positions are correct + how many are wrong + how many colors did you get that are needed elsewhere
+ * 4a: what positions are correct + how many are wrong + how many fields have a wrong color that is needed elsewhere
+ * 5: what position is correct, what position is incorrect, what position has a color that is needed elsewhere (c limited to how many of that color are still needed - how wordle does it)
+ * 5a: what position is correct, what position is incorrect, what position has a color that is needed elsewhere (every isntance of a color that is still needed gets a c, even though there might only be 1 left)
+ */
+type Feedback = 1 | 2 | 3 | '3a' | 4 | '4a' | 5 | '5a';
+
 const COLORS = {
   red: '#D81B60',
   blue: '#1E88E5',
@@ -120,14 +132,16 @@ function MasterMindle({
   next,
   maxTime,
   timeLeft,
+  timeCountUp = false,
   maxGuesses,
   setTimeLeft,
   setQuitLastGame,
 }: {
-  feedback: 1 | 2 | 3 | 4 | 5;
+  feedback: Feedback;
   next: (data: object) => void;
   maxTime: number;
   timeLeft: number;
+  timeCountUp?: boolean;
   maxGuesses: number;
   setTimeLeft: (time: number) => void;
   setQuitLastGame: (quit: boolean) => void;
@@ -315,11 +329,11 @@ function MasterMindle({
   };
 
   return (
-    <div className='mt-16 md:p-8 lg:mt-16 max-w-7xl h-[calc(100vh-230px)] lg:h-full w-fit mx-auto flex flex-col lg:flex-row xl:gap-x-12 lg:gap-x-8 justify-between lg:justify-center'>
+    <div className='mt-16 lg:p-8 lg:mt-16 max-w-7xl h-[calc(100vh-230px)] md:h-full w-fit mx-auto flex flex-col lg:flex-row xl:gap-x-12 lg:gap-x-8 justify-between lg:justify-center'>
       <div className='absolute inset-0 -z-10 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]'></div>
 
       {/* Action Buttons */}
-      <div className='flex gap-6 xl:w-56 xl:px-12 lg:p-4 flex-row justify-center lg:justify-start lg:flex-col'>
+      <div className='flex gap-6 xl:w-56 xl:px-12 lg:p-4 flex-row justify-center lg:justify-start lg:flex-col mt-10 lg:mt-0 sm:pb-4 lg:mb-0'>
         {!roundOver && (
           <button
             className='bg-white px-6 md:px-8 py-3 text-sm md:text-lg border-2 border-black font-bold rounded-full shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
@@ -357,65 +371,69 @@ function MasterMindle({
             NEXT
           </button>
         )}
-        
       </div>
 
       {/* Gameboard */}
       <div className='flex flex-col justify-between order-first items-center lg:order-none min-h-0'>
-        <div className='space-y-4 -mt-8 sm:mt-0 md:space-y-8 flex-1'>
+        <div className='space-y-4 -mt-8 sm:mt-0 lg:space-y-8 flex-1'>
           {/* Timer */}
           <div className='flex justify-center items-center gap-6'>
-            <div className='text-lg text-center sm:text-2xl font-bold w-20 sm:text-left'>
-              {Math.floor(localTimeLeft / 60)}:{(localTimeLeft % 60).toString().padStart(2, '0')}
+            <div className='text-lg text-center sm:text-2xl font-bold w-20'>
+              {Math.floor((timeCountUp ? maxTime - localTimeLeft : localTimeLeft) / 60)}:
+              {((timeCountUp ? maxTime - localTimeLeft : localTimeLeft) % 60)
+                .toString()
+                .padStart(2, '0')}
             </div>
           </div>
           {/* Current Guess Slots */}
           <div className='py-5 sm:py-10 md:p-10 rounded-lg'>
             <div className='flex gap-4 sm:gap-8 justify-center relative w-fit mx-auto'>
               <div className='absolute top-1/2 h-1 left-0 right-0 bg-gray-300 -z-10' />
-              {currentGuess.map((color: ColorKey | null, index: number) => (
-                <ColorOrb
-                  key={index}
-                  color={color ?? 'grey'}
-                  size={screenWidth >= 600 ? 24 : 16}
-                  hoverborder={selectedColor != null || (!!color && color !== 'grey')}
-                  onClick={() => {
-                    if (roundOver) {
-                      return;
-                    }
-                    if (!selectedColor || selectedColor === 'grey') {
-                      if (!!color && color != 'grey') {
+              {(roundOver ? solution : currentGuess).map(
+                (color: ColorKey | null, index: number) => (
+                  <ColorOrb
+                    key={index}
+                    color={color ?? 'grey'}
+                    size={screenWidth >= 600 ? 24 : 16}
+                    hoverborder={selectedColor != null || (!!color && color !== 'grey')}
+                    onClick={() => {
+                      if (roundOver) {
+                        return;
+                      }
+                      if (!selectedColor || selectedColor === 'grey') {
+                        if (!!color && color != 'grey') {
+                          setCurrentGuess((prevGuess) =>
+                            prevGuess.map((color, i) => (i === index ? null : color)),
+                          );
+                          return;
+                        }
+                        toast('Please select a color first!', {
+                          position: 'top-center',
+                          hideProgressBar: true,
+                          closeOnClick: true,
+                          pauseOnHover: true,
+                          draggable: false,
+                          progress: undefined,
+                          theme: 'light',
+                          transition: Bounce,
+                        });
+                        return;
+                      }
+
+                      if (selectedColor === color) {
                         setCurrentGuess((prevGuess) =>
                           prevGuess.map((color, i) => (i === index ? null : color)),
                         );
                         return;
                       }
-                      toast('Please select a color first!', {
-                        position: 'top-center',
-                        hideProgressBar: true,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: false,
-                        progress: undefined,
-                        theme: 'light',
-                        transition: Bounce,
-                      });
-                      return;
-                    }
 
-                    if (selectedColor === color) {
                       setCurrentGuess((prevGuess) =>
-                        prevGuess.map((color, i) => (i === index ? null : color)),
+                        prevGuess.map((color, i) => (i === index ? selectedColor : color)),
                       );
-                      return;
-                    }
-
-                    setCurrentGuess((prevGuess) =>
-                      prevGuess.map((color, i) => (i === index ? selectedColor : color)),
-                    );
-                  }}
-                />
-              ))}
+                    }}
+                  />
+                ),
+              )}
             </div>
           </div>
 
@@ -435,13 +453,37 @@ function MasterMindle({
                   {guess.colors.map((color, index) => (
                     <div key={index} className='flex flex-col items-center'>
                       <ColorOrb key={index} color={color} size={12} />
-                      {feedback == 4 && (
+                      {(feedback == '4a' || feedback == 4) && (
                         <span>
                           {guess.results[index].status === 'correct' && '✓'}
                           {guess.results[index].status !== 'correct' && <>&nbsp;</>}
                         </span>
                       )}
                       {feedback == 5 && (
+                        <span>
+                          {guess.results[index].status === 'correct' && '✓'}
+                          {guess.results[index].status === 'incorrect' && '✗'}
+                          {guess.results[index].status === 'wrong-position' &&
+                            (() => {
+                              const remainingInSolution = solution.filter(
+                                (color, i) =>
+                                  color === guess.results[index].color &&
+                                  guess.results[i].status !== 'correct',
+                              ).length;
+
+                              const usedCCount = guess.results
+                                .slice(0, index)
+                                .filter(
+                                  (r) =>
+                                    r.status === 'wrong-position' &&
+                                    r.color === guess.results[index].color,
+                                ).length;
+
+                              return usedCCount < remainingInSolution ? 'C' : '✗';
+                            })()}
+                        </span>
+                      )}
+                      {feedback == '5a' && (
                         <span>
                           {guess.results[index].status == 'correct' && '✓'}
                           {guess.results[index].status == 'incorrect' && '✗'}
@@ -486,6 +528,28 @@ function MasterMindle({
                       <span className='font-bold'>C</span>
                       <span>
                         {
+                          new Set(
+                            guess.results
+                              .filter((result) => result.status === 'wrong-position')
+                              .map((result) => result.color),
+                          ).size
+                        }
+                      </span>
+                    </>
+                  )}
+                  {feedback == '3a' && (
+                    <>
+                      <span className='font-bold text-blue-600'>✓</span>
+                      <span>
+                        {guess.results.filter((result) => result.status === 'correct').length}
+                      </span>
+                      <span className='font-bold text-red-600'>✗</span>
+                      <span>
+                        {guess.results.filter((result) => result.status === 'incorrect').length}
+                      </span>
+                      <span className='font-bold'>C</span>
+                      <span>
+                        {
                           guess.results.filter((result) => result.status === 'wrong-position')
                             .length
                         }
@@ -493,6 +557,24 @@ function MasterMindle({
                     </>
                   )}
                   {feedback == 4 && (
+                    <>
+                      <span className='font-bold text-red-600'>✗</span>
+                      <span>
+                        {guess.results.filter((result) => result.status === 'incorrect').length}
+                      </span>
+                      <span className='font-bold'>C</span>
+                      <span>
+                        {
+                          new Set(
+                            guess.results
+                              .filter((result) => result.status === 'wrong-position')
+                              .map((result) => result.color),
+                          ).size
+                        }
+                      </span>
+                    </>
+                  )}
+                  {feedback == '4a' && (
                     <>
                       <span className='font-bold text-red-600'>✗</span>
                       <span>
@@ -515,7 +597,7 @@ function MasterMindle({
       </div>
 
       {/* Right Side - Color Selection */}
-      <div className='lg:space-y-6 xl:px-8 flex flex-row justify-center gap-x-4 sm:gap-x-12 lg:gap-x-0 lg:justify-start lg:flex-col'>
+      <div className='lg:space-y-6 xl:px-8 flex flex-row justify-center gap-x-4 sm:gap-x-8 lg:gap-x-0 lg:justify-start lg:flex-col'>
         {(Object.keys(COLORS) as ColorKey[])
           .filter((color) => color !== 'grey')
           .map((color) => (
@@ -563,19 +645,20 @@ function MasterMindleWrapper({
   blockIndex,
   feedback,
   timeLimit = 120,
+  timeCountUp = false,
   maxGuesses = 10,
 }: {
   next: (data: object) => void;
   blockIndex: number;
-  feedback: 1 | 2 | 3 | 4 | 5;
+  feedback: Feedback;
   timeLimit: number;
+  timeCountUp?: boolean;
   maxGuesses: number;
 }) {
   const [gameState, setGameState] = useState<'game' | 'survey'>('game');
   const [timeLeft, setTimeLeft] = useState(timeLimit);
-  const [trialStartTime, setTrialStartTime] = useState(now());
+  const trialStartTimeRef = useRef(now());
   const [accumulatedData, setAccumulatedData] = useState<MMTrialData[]>([]);
-  const [quitLastGame, setQuitLastGame] = useState<boolean>(false);
   const [trialIndex, setTrialIndex] = useState(0);
 
   function switchGameState(newData: object) {
@@ -584,9 +667,9 @@ function MasterMindleWrapper({
     const trialData: MMTrialData = {
       type: gameState,
       index: trialIndex,
-      start: trialStartTime,
+      start: trialStartTimeRef.current,
       end: currentTime,
-      duration: currentTime - trialStartTime,
+      duration: currentTime - trialStartTimeRef.current,
       data: newData,
     };
 
@@ -602,11 +685,7 @@ function MasterMindleWrapper({
 
     setAccumulatedData((prev) => [...prev, trialData]);
 
-    if (gameState === 'survey') {
-      setQuitLastGame(false);
-    }
-
-    setTrialStartTime(currentTime);
+    trialStartTimeRef.current = currentTime;
     setTrialIndex((prev) => prev + 1);
     setGameState(gameState === 'survey' ? 'game' : 'survey');
   }
@@ -629,16 +708,6 @@ function MasterMindleWrapper({
                   minRateDescription: 'Minimal Effort',
                   maxRateDescription: 'Maximum Effort',
                 },
-                ...(quitLastGame
-                  ? [
-                      {
-                        type: 'voicerecorder',
-                        name: 'whyskip',
-                        title: 'Why did you chose to quit before you found the solution?',
-                        isRequired: true,
-                      },
-                    ]
-                  : [{}]),
               ],
             },
           ],
@@ -652,9 +721,10 @@ function MasterMindleWrapper({
       next={switchGameState}
       maxTime={timeLimit}
       maxGuesses={maxGuesses}
+      timeCountUp={timeCountUp}
       timeLeft={timeLeft}
       setTimeLeft={setTimeLeft}
-      setQuitLastGame={setQuitLastGame}
+      setQuitLastGame={() => {}}
     />
   );
 }

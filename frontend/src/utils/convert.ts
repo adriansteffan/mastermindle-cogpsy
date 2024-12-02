@@ -83,17 +83,23 @@ export function convertData(studyData: StudyEvent[]) {
     switch (trial.type) {
       case 'MasterMindleWrapper': {
         lastTrialWasMasterMindle = true;
-        const blockSurvey = studyData[i + 1];
-        const { answers, audios } = processSurvey(`${trial.name}`, blockSurvey.data);
-        audioData = [...audioData, ...audios];
         const { data: games, ...trialMetaData } = trial.data;
 
-        blockData.push({ ...baseEventData, ...trialMetaData, ...answers });
+        // Process next 3 surveys and combine their answers
+        let combinedAnswers = {};
+
+        for (let j = 0; j < 3; j++) {
+          const blockSurvey = studyData[i + j + 1];
+          const { answers, audios } = processSurvey(`${trial.name}`, blockSurvey.data);
+          combinedAnswers = { ...combinedAnswers, ...answers };
+          audioData = [...audioData, ...audios];
+        }
+        
+        blockData.push({ ...baseEventData, ...trialMetaData, ...combinedAnswers });
 
         // alternating game and survey
         let gameMetaData: { solution?: string[] | string } = {};
         for (const subTrial of games) {
-          
           if (subTrial.type == 'game') {
             const gameIndex = subTrial.index / 2;
             let guesses = [];
@@ -119,10 +125,7 @@ export function convertData(studyData: StudyEvent[]) {
             }
           } else if (subTrial.type == 'survey') {
             const gameIndex = (subTrial.index - 1) / 2;
-            const { answers, audios } = processSurvey(
-              `${trial.name}_${gameIndex}`,
-              subTrial.data,
-            );
+            const { answers, audios } = processSurvey(`${trial.name}_${gameIndex}`, subTrial.data);
             audioData = [...audioData, ...audios];
             gameData.push({
               ...{
@@ -134,7 +137,6 @@ export function convertData(studyData: StudyEvent[]) {
                 duration: subTrial.duration,
                 start: subTrial.start,
                 end: subTrial.end,
-                
               },
               ...gameMetaData,
               ...answers,
@@ -152,12 +154,16 @@ export function convertData(studyData: StudyEvent[]) {
         const { answers, audios } = processSurvey(`${trial.name}`, trial.data);
         audioData = [...audioData, ...audios];
 
-        globalData.push({ ...baseEventData, ...answers });
+        globalData.push({
+          ...baseEventData,
+          ...answers,
+          ...{ userAgent: window.navigator.userAgent },
+        });
         break;
       }
     }
 
-    if (trial.type != 'MasterMindleWrapper') {
+    if (trial.type != 'MasterMindleWrapper' && !(trial.type === 'Quest' && trial.name.includes('blocktype'))) { // fix for multiple surveys belonging to the mastermindle trial
       lastTrialWasMasterMindle = false;
     }
   }

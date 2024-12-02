@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import Upload from './components/upload';
 import Text from './components/text';
@@ -58,82 +58,82 @@ const experiment = [
             <strong>Participant Information</strong>
           </h1>
           <br />I think there is supposed to be a consent screen here, but Chris did not send me
-          anything yet, so... 10 points to whoever can tell me where this is from: Call me Ishmael. Some years ago—never mind how long precisely—having
-          little or no money in my purse, and nothing particular to interest me on shore, I thought
-          I would sail about a little and see the watery part of the world. It is a way I have of
-          driving off the spleen and regulating the circulation. Whenever I find myself growing grim
-          about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find
-          myself involuntarily pausing before coffin warehouses, and bringing up the rear of every
-          funeral I meet; and especially whenever my hypos get such an upper hand of me, that it
-          requires a strong moral principle to prevent me from deliberately stepping into the
-          street, and methodically knocking people’s hats off—then, I account it high time to get to
-          sea as soon as I can. This is my substitute for pistol and ball. With a philosophical
-          flourish Cato throws himself upon his sword; I quietly take to the ship. There is nothing
-          surprising in this. If they but knew it, almost all men in their degree, some time or
-          other, cherish very nearly the same feelings towards the ocean with me. There now is your
-          insular city of the Manhattoes, belted round by wharves as Indian isles by coral
-          reefs—commerce surrounds it with her surf. Right and left, the streets take you waterward.
-          Its extreme downtown is the battery, where that noble mole is washed by waves, and cooled
-          by breezes, which a few hours previous were out of sight of land. Look at the crowds of
-          water-gazers there. Circumambulate the city of a dreamy Sabbath afternoon. Go from
-          Corlears Hook to Coenties Slip, and from thence, by Whitehall, northward. What do you
-          see?—Posted like silent sentinels all around the town, stand thousands upon thousands of
-          mortal men fixed in ocean reveries. Some leaning against the spiles; some seated upon the
-          pier-heads; some looking over the bulwarks of ships from China; some high aloft in the
-          rigging, as if striving to get a still better seaward peep. But these are all landsmen; of
-          week days pent up in lath and plaster—tied to counters, nailed to benches, clinched to
-          desks. How then is this? Are the green fields gone? What do they here? But look! here come
-          more crowds, pacing straight for the water, and seemingly bound for a dive. Strange!
-          Nothing will content them but the extremest limit of the land; loitering under the shady
-          lee of yonder warehouses will not suffice. No. They must get just as nigh the water as
-          they possibly can without falling in. And there they stand—miles of them—leagues.
-          Inlanders all, they come from lanes and alleys, streets and avenues—north, east, south,
-          and west. Yet here they all unite. Tell me, does the magnetic virtue of the needles of the
-          compasses of all those ships attract them thither? Once more. Say you are in the country;
-          in some high land of lakes. Take almost any path you please, and ten to one it carries you
-          down in a dale, and leaves you there by a pool in the stream. There is magic in it. Let
-          the most absent-minded of men be plunged in his deepest reveries—stand that man on his
-          legs, set his feet a-going, and he will infallibly lead you to water, if water there be in
-          all that region. Should you ever be athirst in the great American desert, try this
-          experiment, if your caravan happen to be supplied with a metaphysical professor. Yes, as
-          every one knows, meditation and water are wedded for ever. But here is an artist. He
-          desires to paint you the dreamiest, shadiest, quietest, most enchanting bit of romantic
-          landscape in all the valley of the Saco. What is the chief element he employs? There stand
-          his trees, each with a hollow trunk, as if a hermit and a crucifix were within; and here
-          sleeps his meadow, and there sleep his cattle; and up from yonder cottage goes a sleepy
-          smoke. Deep into distant woodlands winds a mazy way, reaching to overlapping spurs of
-          mountains bathed in their hill-side blue. But though the picture lies thus tranced, and
-          though this pine-tree shakes down its sighs like leaves upon this shepherd’s head, yet all
-          were vain, unless the shepherd’s eye were fixed upon the magic stream before him. Go visit
-          the Prairies in June, when for scores on scores of miles you wade knee-deep among
-          Tiger-lilies—what is the one charm wanting?—Water—there is not a drop of water there! Were
-          Niagara but a cataract of sand, would you travel your thousand miles to see it? Why did
-          the poor poet of Tennessee, upon suddenly receiving two handfuls of silver, deliberate
-          whether to buy him a coat, which he sadly needed, or invest his money in a pedestrian trip
-          to Rockaway Beach? Why is almost every robust healthy boy with a robust healthy soul in
-          him, at some time or other crazy to go to sea? Why upon your first voyage as a passenger,
-          did you yourself feel such a mystical vibration, when first told that you and your ship
-          were now out of sight of land? Why did the old Persians hold the sea holy? Why did the
-          Greeks give it a separate deity, and own brother of Jove? Surely all this is not without
-          meaning. And still deeper the meaning of that story of Narcissus, who because he could not
-          grasp the tormenting, mild image he saw in the fountain, plunged into it and was drowned.
-          But that same image, we ourselves see in all rivers and oceans. It is the image of the
-          ungraspable phantom of life; and this is the key to it all. Now, when I say that I am in
-          the habit of going to sea whenever I begin to grow hazy about the eyes, and begin to be
-          over conscious of my lungs, I do not mean to have it inferred that I ever go to sea as a
-          passenger. For to go as a passenger you must needs have a purse, and a purse is but a rag
-          unless you have something in it. Besides, passengers get sea-sick—grow quarrelsome—don’t
-          sleep of nights—do not enjoy themselves much, as a general thing;—no, I never go as a
-          passenger; nor, though I am something of a salt, do I ever go to sea as a Commodore, or a
-          Captain, or a Cook. I abandon the glory and distinction of such offices to those who like
-          them. For my part, I abominate all honorable respectable toils, trials, and tribulations
-          of every kind whatsoever. It is quite as much as I can do to take care of myself, without
-          taking care of ships, barques, brigs, schooners, and what not. And as for going as
-          cook,—though I confess there is considerable glory in that, a cook being a sort of officer
-          on ship-board—yet, somehow, I never fancied broiling fowls;—though once broiled,
-          judiciously buttered, and judgmatically salted and peppered, there is no one who will
-          speak more respectfully, not to say reverentially, of a broiled fowl than I will. It is
-          out of the idolatrous dotings of the old Egyptians upon broiled ibis and roasted river
+          anything yet, so... 10 points to whoever can tell me where this is from: Call me Ishmael.
+          Some years ago—never mind how long precisely—having little or no money in my purse, and
+          nothing particular to interest me on shore, I thought I would sail about a little and see
+          the watery part of the world. It is a way I have of driving off the spleen and regulating
+          the circulation. Whenever I find myself growing grim about the mouth; whenever it is a
+          damp, drizzly November in my soul; whenever I find myself involuntarily pausing before
+          coffin warehouses, and bringing up the rear of every funeral I meet; and especially
+          whenever my hypos get such an upper hand of me, that it requires a strong moral principle
+          to prevent me from deliberately stepping into the street, and methodically knocking
+          people’s hats off—then, I account it high time to get to sea as soon as I can. This is my
+          substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his
+          sword; I quietly take to the ship. There is nothing surprising in this. If they but knew
+          it, almost all men in their degree, some time or other, cherish very nearly the same
+          feelings towards the ocean with me. There now is your insular city of the Manhattoes,
+          belted round by wharves as Indian isles by coral reefs—commerce surrounds it with her
+          surf. Right and left, the streets take you waterward. Its extreme downtown is the battery,
+          where that noble mole is washed by waves, and cooled by breezes, which a few hours
+          previous were out of sight of land. Look at the crowds of water-gazers there.
+          Circumambulate the city of a dreamy Sabbath afternoon. Go from Corlears Hook to Coenties
+          Slip, and from thence, by Whitehall, northward. What do you see?—Posted like silent
+          sentinels all around the town, stand thousands upon thousands of mortal men fixed in ocean
+          reveries. Some leaning against the spiles; some seated upon the pier-heads; some looking
+          over the bulwarks of ships from China; some high aloft in the rigging, as if striving to
+          get a still better seaward peep. But these are all landsmen; of week days pent up in lath
+          and plaster—tied to counters, nailed to benches, clinched to desks. How then is this? Are
+          the green fields gone? What do they here? But look! here come more crowds, pacing straight
+          for the water, and seemingly bound for a dive. Strange! Nothing will content them but the
+          extremest limit of the land; loitering under the shady lee of yonder warehouses will not
+          suffice. No. They must get just as nigh the water as they possibly can without falling in.
+          And there they stand—miles of them—leagues. Inlanders all, they come from lanes and
+          alleys, streets and avenues—north, east, south, and west. Yet here they all unite. Tell
+          me, does the magnetic virtue of the needles of the compasses of all those ships attract
+          them thither? Once more. Say you are in the country; in some high land of lakes. Take
+          almost any path you please, and ten to one it carries you down in a dale, and leaves you
+          there by a pool in the stream. There is magic in it. Let the most absent-minded of men be
+          plunged in his deepest reveries—stand that man on his legs, set his feet a-going, and he
+          will infallibly lead you to water, if water there be in all that region. Should you ever
+          be athirst in the great American desert, try this experiment, if your caravan happen to be
+          supplied with a metaphysical professor. Yes, as every one knows, meditation and water are
+          wedded for ever. But here is an artist. He desires to paint you the dreamiest, shadiest,
+          quietest, most enchanting bit of romantic landscape in all the valley of the Saco. What is
+          the chief element he employs? There stand his trees, each with a hollow trunk, as if a
+          hermit and a crucifix were within; and here sleeps his meadow, and there sleep his cattle;
+          and up from yonder cottage goes a sleepy smoke. Deep into distant woodlands winds a mazy
+          way, reaching to overlapping spurs of mountains bathed in their hill-side blue. But though
+          the picture lies thus tranced, and though this pine-tree shakes down its sighs like leaves
+          upon this shepherd’s head, yet all were vain, unless the shepherd’s eye were fixed upon
+          the magic stream before him. Go visit the Prairies in June, when for scores on scores of
+          miles you wade knee-deep among Tiger-lilies—what is the one charm wanting?—Water—there is
+          not a drop of water there! Were Niagara but a cataract of sand, would you travel your
+          thousand miles to see it? Why did the poor poet of Tennessee, upon suddenly receiving two
+          handfuls of silver, deliberate whether to buy him a coat, which he sadly needed, or invest
+          his money in a pedestrian trip to Rockaway Beach? Why is almost every robust healthy boy
+          with a robust healthy soul in him, at some time or other crazy to go to sea? Why upon your
+          first voyage as a passenger, did you yourself feel such a mystical vibration, when first
+          told that you and your ship were now out of sight of land? Why did the old Persians hold
+          the sea holy? Why did the Greeks give it a separate deity, and own brother of Jove? Surely
+          all this is not without meaning. And still deeper the meaning of that story of Narcissus,
+          who because he could not grasp the tormenting, mild image he saw in the fountain, plunged
+          into it and was drowned. But that same image, we ourselves see in all rivers and oceans.
+          It is the image of the ungraspable phantom of life; and this is the key to it all. Now,
+          when I say that I am in the habit of going to sea whenever I begin to grow hazy about the
+          eyes, and begin to be over conscious of my lungs, I do not mean to have it inferred that I
+          ever go to sea as a passenger. For to go as a passenger you must needs have a purse, and a
+          purse is but a rag unless you have something in it. Besides, passengers get sea-sick—grow
+          quarrelsome—don’t sleep of nights—do not enjoy themselves much, as a general thing;—no, I
+          never go as a passenger; nor, though I am something of a salt, do I ever go to sea as a
+          Commodore, or a Captain, or a Cook. I abandon the glory and distinction of such offices to
+          those who like them. For my part, I abominate all honorable respectable toils, trials, and
+          tribulations of every kind whatsoever. It is quite as much as I can do to take care of
+          myself, without taking care of ships, barques, brigs, schooners, and what not. And as for
+          going as cook,—though I confess there is considerable glory in that, a cook being a sort
+          of officer on ship-board—yet, somehow, I never fancied broiling fowls;—though once
+          broiled, judiciously buttered, and judgmatically salted and peppered, there is no one who
+          will speak more respectfully, not to say reverentially, of a broiled fowl than I will. It
+          is out of the idolatrous dotings of the old Egyptians upon broiled ibis and roasted river
           horse, that you see the mummies of those creatures in their huge bake-houses the pyramids.
           No, when I go to sea, I go as a simple sailor, right before the mast, plumb down into the
           forecastle, aloft there to the royal mast-head. True, they rather order me about some, and
@@ -217,15 +217,18 @@ const experiment = [
           </h1>
 
           <p>
-            In each round of this game you will try to guess the correct 4-color-code, starting from an empty array and working with the feedback you are
-            given after each guess. To assemble a guess, choose a color on the right and then click the empty spots in the middle of the board (each color can be used multiple
-            times). Each game round has a specific code to be guessed and you will be allowed to take a maximum of X
-            guesses, which you will be able to verify using the “CHECK” button; however, there will
-            also be a “SKIP” button available, should you wish to forfeit the current secret colour
-            code and continue the game with another one.
-            <br /><br />
-            The 5 versions of the game will all have different feedback mechanisms, and you will play them for X minutes each. Try to get as many combinations correct as
-            possible.
+            In each round of this game you will try to guess the correct 4-color-code, starting from
+            an empty array and working with the feedback you are given after each guess. To assemble
+            a guess, choose a color on the right and then click the empty spots in the middle of the
+            board (each color can be used multiple times). Each game round has a specific code to be
+            guessed and you will be allowed to take a maximum of X guesses, which you will be able
+            to verify using the “CHECK” button; however, there will also be a “SKIP” button
+            available, should you wish to forfeit the current secret colour code and continue the
+            game with another one.
+            <br />
+            <br />
+            The 5 versions of the game will all have different feedback mechanisms, and you will
+            play them for X minutes each. Try to get as many combinations correct as possible.
           </p>
         </>
       ),
@@ -234,6 +237,7 @@ const experiment = [
   ...shuffleArray([
     {
       feedbacktype: 1,
+      timeLimit: 150,
       text: (
         <>
           <h1 className='text-4xl mb-8'>
@@ -249,49 +253,17 @@ const experiment = [
       ),
     },
     {
-      feedbacktype: 2,
-      text: (
-        <>
-          <h1 className='text-4xl mb-8'>
-            <strong>Get ready!</strong>
-          </h1>
-          <p>
-            Remember, to verify your guess, press "Check". You will then receive feedback on whether
-            your guess was correct or, on how many positions are correct and how many are incorrect.
-            If you would like to skip the current color code to be guessed and instead be given a
-            new one, please press "Skip".
-          </p>
-        </>
-      ),
-    },
-    {
       feedbacktype: 3,
+      timeLimit: 300,
       text: (
         <>
           <h1 className='text-4xl mb-8'>
-            <strong>Get ready!</strong> <br/>
+            <strong>Get ready!</strong> <br />
           </h1>
           <p>
             Remember, to verify your guess, press "Check". You will then receive feedback on whether
             your guess was correct or, if not, on how many positions are correct (✓), how many are
-            incorrect (X), and how many have a correct colour which is found in another spot (C). If
-            you would like to skip the current color code to be guessed and instead be given a new
-            one, please press "Skip".
-          </p>
-        </>
-      ),
-    },
-    {
-      feedbacktype: 4,
-      text: (
-        <>
-          <h1 className='text-4xl mb-8'>
-            <strong>Get ready!</strong>
-          </h1>
-          <p>
-            Remember, to verify your guess, press "Check". You will then receive feedback on whether
-            your guess was correct or, if not, which positions are correct (✓), how many are
-            incorrect (X), and how many have a correct colour which is found in another spot (C). If
+            incorrect (X), and how many different colors should be placed in another spot (C). If
             you would like to skip the current color code to be guessed and instead be given a new
             one, please press "Skip".
           </p>
@@ -300,6 +272,7 @@ const experiment = [
     },
     {
       feedbacktype: 5,
+      timeLimit: 300,
       text: (
         <>
           <h1 className='text-4xl mb-8'>
@@ -330,12 +303,13 @@ const experiment = [
       props: {
         blockIndex: `${blockindex}`,
         feedback: block.feedbacktype,
-        timeLimit: 120,
+        timeLimit: block.timeLimit,
+        timeCountUp: true,
         maxGuesses: 8,
       },
     },
     {
-      name: `blocktype${block.feedbacktype}_blockindex${blockindex}_survey`,
+      name: `blocktype${block.feedbacktype}_blockindex${blockindex}_survey1`,
       type: 'Quest',
       props: {
         surveyJson: {
@@ -356,63 +330,106 @@ const experiment = [
                 {
                   type: 'rating',
                   name: 'valenceofeffort',
-                  title: 'How positive or negative did you perceive your exerted effort to be? (Scale missing)',
+                  title: 'How did you perceive your exerted effort to be?',
                   isRequired: true,
                   rateMin: 1,
                   rateMax: 6,
-                  minRateDescription: 'Oh',
-                  maxRateDescription: 'no',
-                },
-                {
-                  type: 'voicerecorder',
-                  name: 'senseofeffort',
-                  title:
-                    'Please describe how would design a question targetted at extracting: Sense of effort, qualitative question (Question Missing)',
-                  isRequired: true,
-                },
-                {
-                  type: 'voicerecorder',
-                  name: 'strategyusage',
-                  title: 'What strategy did you use the most in this block? (Yellow in doc)',
-                  isRequired: true,
+                  minRateDescription: 'Aversive',
+                  maxRateDescription: 'Enjoyable',
                 },
                 {
                   type: 'rating',
-                  name: 'effortsu',
-                  title: 'How effortful was the usage of this strategy?',
+                  name: 'intensity',
+                  title: 'How hard did you try to solve the combinations in this block?',
                   isRequired: true,
                   rateMin: 1,
                   rateMax: 6,
-                  minRateDescription: 'Not at all',
-                  maxRateDescription: 'Extremely',
-                },
-                {
-                  type: 'rating',
-                  name: 'helpfulsu',
-                  title: 'How helpful was the usage of this strategy to find the correct order?',
-                  isRequired: true,
-                  rateMin: 1,
-                  rateMax: 6,
-                  minRateDescription: 'Not at all',
-                  maxRateDescription: 'Extremely',
+                  minRateDescription: 'Not hard at all',
+                  maxRateDescription: 'Extremely hard',
                 },
                 {
                   type: 'rating',
                   name: 'boredom',
-                  title:
-                    'Are you bored of this unifnished questionaire? Would it be more fun if all questions were already there? (Question missing)',
+                  title: 'How boring did you find the combinations in this block to solve?',
                   isRequired: true,
                   rateMin: 1,
                   rateMax: 6,
-                  minRateDescription: 'Yes',
-                  maxRateDescription: 'No',
+                  minRateDescription: 'Not boring at all',
+                  maxRateDescription: 'Extremely boring',
+                },
+              ],
+            },
+          ],
+        },
+      },
+    },
+    {
+      name: `blocktype${block.feedbacktype}_blockindex${blockindex}_survey2`,
+      type: 'Quest',
+      props: {
+        surveyJson: {
+          pages: [
+            {
+              elements: [
+                {
+                  type: 'rating',
+                  name: 'usefulsu',
+                  title:
+                    'How useful did you perceive the strategies you used in this block to find the right combination to be?',
+                  isRequired: true,
+                  rateMin: 1,
+                  rateMax: 6,
+                  minRateDescription: 'Not at all',
+                  maxRateDescription: 'Very much',
+                },
+                {
+                  type: 'rating',
+                  name: 'effortsu',
+                  title:
+                    'How effortful did you perceive the strategies you used in this block to be?',
+                  isRequired: true,
+                  rateMin: 1,
+                  rateMax: 6,
+                  minRateDescription: 'Not at all',
+                  maxRateDescription: 'Very much',
+                },
+                {
+                  type: 'rating',
+                  name: 'timeconsumingsu',
+                  title:
+                    'How time-consuming did you perceive the strategies you used in this block to be?',
+                  isRequired: true,
+                  rateMin: 1,
+                  rateMax: 6,
+                  minRateDescription: 'Not at all',
+                  maxRateDescription: 'Very much',
+                },
+              ],
+            },
+          ],
+        },
+      },
+    },
+    {
+      name: `blocktype${block.feedbacktype}_blockindex${blockindex}_survey3`,
+      type: 'Quest',
+      props: {
+        surveyJson: {
+          pages: [
+            {
+              elements: [
+                {
+                  type: 'radiogroup',
+                  name: 'timeupyesno',
+                  title: 'When time was up, did you choose to keep solving the task?',
+                  choices: ['Yes', 'No'],
+                  isRequired: true,
                 },
                 {
                   type: 'voicerecorder',
                   name: 'whatmadecontinue',
-                  title:
-                    'For trials in which you either persisted until you reached the correct solution or the time for additional guesses elapsed, what made you persevere?',
-                  isRequired: true,
+                  title: 'If yes, why?',
+                  isRequired: false,
                 },
               ],
             },
@@ -422,7 +439,7 @@ const experiment = [
     },
   ]),
   {
-    name: 'exitsurvey',
+    name: 'exitsurvey1',
     type: 'Quest',
     props: {
       surveyJson: {
@@ -436,7 +453,7 @@ const experiment = [
                 title:
                   'For each sentence below, please select how uncharacteristic or characteristic this is for you personally.',
 
-                elements: shuffleArray([
+                elements: [
                   {
                     value: 'complex_problems',
                     text: 'I would prefer complex to simple problems.',
@@ -461,7 +478,7 @@ const experiment = [
                     value: 'intellectual_task',
                     text: 'I would prefer a task that is intellectual, difficult, and important to one that is somewhat important but does not require much thought.',
                   },
-                ]).map((row) => ({
+                ].map((row) => ({
                   type: 'rating',
                   name: `ncs_6_${row.value}`,
                   title: row.text,
@@ -472,35 +489,44 @@ const experiment = [
                   maxRateDescription: 'Extremely characteristic',
                 })),
               },
+            ],
+          },
+        ],
+      },
+    },
+  },
+  {
+    name: 'exitsurvey2',
+    type: 'Quest',
+    props: {
+      surveyJson: {
+        pages: [
+          {
+            elements: [
               {
                 type: 'imagepicker',
                 name: 'choosefeedback',
                 title:
-                  'If you could continue playing the game, which feedback option would you choose? (Placeholder images until we finalize on the design)',
+                  'If you could continue playing the game, which feedback option would you choose?',
                 isRequired: true,
                 imageWidth: 200,
                 imageHeight: 150,
                 showLabel: true,
                 choices: [
                   {
-                    value: '2',
-                    imageLink: 'https://placehold.co/600x400/EEE/31343C',
+                    value: '1',
+                    imageLink: '/1.png',
                     text: 'A',
                   },
                   {
                     value: '3',
-                    imageLink: 'https://placehold.co/600x400/EEE/31343C',
+                    imageLink: '/3.png',
                     text: 'B',
                   },
                   {
-                    value: '4',
-                    imageLink: 'https://placehold.co/600x400/EEE/31343C',
-                    text: 'C',
-                  },
-                  {
                     value: '5',
-                    imageLink: 'https://placehold.co/600x400/EEE/31343C',
-                    text: 'D',
+                    imageLink: '/5.png',
+                    text: 'C',
                   },
                 ],
               },
@@ -601,11 +627,11 @@ interface TrialData {
 export default function App() {
   const [trialCounter, setTrialCounter] = useState(0);
   const [data, setData] = useState<TrialData[]>([]);
-  const [trialStartTime, setTrialStartTime] = useState(now());
+  const trialStartTimeRef = useRef(now());
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [trialCounter])
+    window.scrollTo(0, 0);
+  }, [trialCounter]);
 
   function next(newData?: object): void {
     const currentTime = now();
@@ -622,16 +648,15 @@ export default function App() {
         type: currentTrial.type,
         name: currentTrial.name,
         data: newData,
-        start: trialStartTime,
+        start: trialStartTimeRef.current,
         end: currentTime,
-        duration: currentTime - trialStartTime,
+        duration: currentTime - trialStartTimeRef.current,
       };
-      //console.log([...data, trialData]);
       setData([...data, trialData]);
     }
 
     // Set the start time for the next trial
-    setTrialStartTime(currentTime);
+    trialStartTimeRef.current = currentTime;
     setTrialCounter(trialCounter + 1);
   }
 
