@@ -221,14 +221,13 @@ const experiment = [
             an empty array and working with the feedback you are given after each guess. To assemble
             a guess, choose a color on the right and then click the empty spots in the middle of the
             board (each color can be used multiple times). Each game round has a specific code to be
-            guessed and you will be allowed to take a maximum of X guesses, which you will be able
+            guessed and you will be allowed to take a maximum of 10 guesses, which you will be able
             to verify using the “CHECK” button; however, there will also be a “SKIP” button
             available, should you wish to forfeit the current secret colour code and continue the
             game with another one.
             <br />
             <br />
-            The 5 versions of the game will all have different feedback mechanisms, and you will
-            play them for X minutes each. Try to get as many combinations correct as possible.
+            The 5 versions of the game will all have different feedback mechanisms. Try to get as many combinations correct as possible.
           </p>
         </>
       ),
@@ -244,7 +243,7 @@ const experiment = [
             <strong>Get ready!</strong>
           </h1>
           <p>
-            Remember, to verify your guess, press "Check". You will then receive feedback on whether
+            You will play this next round for 2 1/2 minutes. Remember, to verify your guess, press "Check". You will then receive feedback on whether
             your guess was correct or not. Please continue and try to guess the correct solution if
             your guess was not correct. If you would like to skip the current color code to be
             guessed and instead be given a new one, please press "Skip".
@@ -261,7 +260,7 @@ const experiment = [
             <strong>Get ready!</strong> <br />
           </h1>
           <p>
-            Remember, to verify your guess, press "Check". You will then receive feedback on whether
+            You will play this next round for 5 minutes. Remember, to verify your guess, press "Check". You will then receive feedback on whether
             your guess was correct or, if not, on how many positions are correct (✓), how many are
             incorrect (X), and how many different colors should be placed in another spot (C). If
             you would like to skip the current color code to be guessed and instead be given a new
@@ -279,7 +278,7 @@ const experiment = [
             <strong>Get ready!</strong>
           </h1>
           <p>
-            Remember, to verify your guess, press "Check". You will then receive feedback on whether
+            You will play this next round for 5 minutes.  Remember, to verify your guess, press "Check". You will then receive feedback on whether
             your guess was correct or, if not, which positions are correct (✓), which are incorrect
             (X), and which have a correct colour which is found in another spot (C). If you would
             like to skip the current color code to be guessed and instead be given a new one, please
@@ -305,7 +304,7 @@ const experiment = [
         feedback: block.feedbacktype,
         timeLimit: block.timeLimit,
         timeCountUp: true,
-        maxGuesses: 8,
+        maxGuesses: 10,
       },
     },
     {
@@ -428,8 +427,9 @@ const experiment = [
                 {
                   type: 'voicerecorder',
                   name: 'whatmadecontinue',
+                  visibleIf: '{timeupyesno} == Yes',
+                  requiredIf: '{timeupyesno} == Yes',
                   title: 'If yes, why?',
-                  isRequired: false,
                 },
               ],
             },
