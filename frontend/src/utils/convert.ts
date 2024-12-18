@@ -168,8 +168,11 @@ export function convertData(studyData: StudyEvent[]) {
     }
   }
 
+  // very hacky fix for joining the two exit surveys. This is no longer needed when consuming this as a library via reactive-psych, so it should not matter that this is ugly here.
+  const globalDataMerged = [{...globalData[1], ...globalData[0]}];
+  
   return {
-    globalCsv: arrayToCSV(globalData),
+    globalCsv: arrayToCSV(globalDataMerged),
     blockCsv: arrayToCSV(blockData),
     gameCsv: arrayToCSV(gameData),
     guessCsv: arrayToCSV(guessData),
