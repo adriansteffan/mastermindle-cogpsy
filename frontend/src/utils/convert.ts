@@ -147,7 +147,7 @@ export function convertData(studyData: StudyEvent[]) {
         break;
       }
       case 'Quest': {
-        if (lastTrialWasMasterMindle) {
+        if (lastTrialWasMasterMindle && !trial.name.includes('exit')) {
           break; // already read in prev iteration by the mastermindle looking ahead 1
         }
 
