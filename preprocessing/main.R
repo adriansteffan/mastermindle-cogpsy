@@ -1,7 +1,7 @@
 library(tidyverse)
 
 read_type <- function(type) {
-  list.files(path = "../data", recursive = TRUE, pattern = paste0("_", type, "\\.csv$"), full.names = TRUE) %>%
+  list.files(path = "../data/data", recursive = TRUE, pattern = paste0("_", type, "\\.csv$"), full.names = TRUE) %>%
     map_df(\(x) read_csv(x) %>% mutate(participant_id = str_extract(basename(x), "^[^_]+"))) %>%
     select(participant_id, everything())
 }
@@ -81,6 +81,7 @@ experiment_data <- list(
   reduce(\(agg, nxt){inner_join(agg, nxt, by = join_cols)})
 
 
+  
 dir.create('./output')
 write_csv(experiment_data, './output/blockdata.csv')
 write_csv(participant_data, './output/participantdata.csv')
