@@ -38,7 +38,7 @@ const experiment = [
           </h1>
           <br />
           In this study we will be investigating under which conditions people exert mental effort
-          and which types of feedback can alter or encourage this. You will be taking part in five
+          and which types of feedback can alter or encourage this. You will be taking part in three
           different variations of a game, each containing the same task but with different feedback
           methods. You will get a detailed explanation of the type of feedback you will be getting
           before each block, however the basic task remains the same. <br />
@@ -96,7 +96,7 @@ const experiment = [
             game with another one.
             <br />
             <br />
-            The 5 versions of the game will all have different feedback mechanisms. Try to get as
+            The 3 versions of the game will all have different feedback mechanisms. Try to get as
             many combinations correct as possible.
           </p>
         </>
