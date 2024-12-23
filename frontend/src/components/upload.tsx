@@ -149,6 +149,7 @@ export default function Upload({ data, next }: { data: StudyEvent[]; next: () =>
           <div className='text-red-500 mb-4'>
             <p className=''>Sorry, there was an error uploading your data.</p>
             <p>Please try again or contact the researcher.</p>
+            <p>If this fails repeatedly, you can go back to Prolific and enter the code {import.meta.env.VITE_PROLIFIC_CODE}</p>
           </div>
           <button
             onClick={handleUpload}

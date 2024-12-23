@@ -440,8 +440,7 @@ const experiment = [
             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' />
           </svg>
           <p className='text-center'>
-            Thank you! Your data has been successfully submitted. <br /> You can now close the
-            browser tab.
+            Thank you! Your data has been successfully submitted. <br /> You can go back to Prolific and enter the code {import.meta.env.VITE_PROLIFIC_CODE} to finish the study. Alternatively, you can click on this link: <a target="_blank" className="text-blue-400" href={`https://app.prolific.com/submissions/complete?cc=${import.meta.env.VITE_PROLIFIC_CODE}`}>Go to Prolific</a>
           </p>
         </div>
       ),
